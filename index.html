@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cinéma en plein air · Opio — Un p'tit truc en plus</title>
+<meta name="description" content="Cinéma en plein air à Opio le lundi 28 juillet 2026 — projection du film « Un p'tit truc en plus » d'Artus. Réservation gratuite, places limitées.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,ital@9..144,300..700,0..1&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+<style>
+:root{
+  --c-bg:#15101F;
+  --c-surface:#241A38;
+  --c-surface-2:#1c1530;
+  --c-gold:#E8A33D;
+  --c-gold-soft:rgba(232,163,61,0.16);
+  --c-lavender:#9B86C9;
+  --c-ivory:#F6F1E7;
+  --c-muted:#B8AFC9;
+  --c-border:rgba(246,241,231,0.1);
+  --font-display:'Fraunces',serif;
+  --font-body:'Outfit',sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+  --radius:20px;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important;}
+}
+
+body{
+  margin:0;
+  background:var(--c-bg);
+  color:var(--c-ivory);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+img,svg{max-width:100%;display:block;}
+
+a{color:inherit;}
+
+h1,h2,h3{
+  font-family:var(--font-display);
+  font-weight:600;
+  margin:0;
+  line-height:1.08;
+}
+
+p{margin:0;}
+
+.container{
+  max-width:1200px;
+  margin:0 auto;
+  padding-inline:24px;
+}
+
+section{
+  position:relative;
+  padding:120px 0;
+}
+
+@media (max-width:768px){
+  section{padding:80px 0;}
+}
+
+.eyebrow{
+  font-family:var(--font-body);
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--c-gold);
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+}
+.eyebrow::before{
+  content:'';
+  width:28px;
+  height:1px;
+  background:var(--c-gold);
+  display:inline-block;
+}
+
+.section-title{
+  font-size:clamp(2rem,4vw,3.2rem);
+  margin-bottom:16px;
+}
+
+.section-lede{
+  color:var(--c-muted);
+  font-size:1.05rem;
+  max-width:560px;
+}
+
+.glass{
+  background:rgba(36,26,56,0.55);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  border:1px solid var(--c-border);
+  border-radius:var(--radius);
+}
+
+/* Focus visibility */
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{
+  outline:2px solid var(--c-gold);
+  outline-offset:3px;
+  border-radius:4px;
+}
+
+/* Buttons */
+.btn{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:18px 36px;
+  font-family:var(--font-body);
+  font-weight:600;
+  font-size:1rem;
+  letter-spacing:0.01em;
+  color:#1A1326;
+  background:linear-gradient(135deg,#F4C26B,var(--c-gold));
+  border:none;
+  border-radius:999px;
+  cursor:pointer;
+  text-decoration:none;
+  isolation:isolate;
+  transition:transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+  box-shadow:0 8px 30px -8px rgba(232,163,61,0.55);
+  touch-action:manipulation;
+}
+.btn::after{
+  content:'';
+  position:absolute;
+  inset:-2px;
+  border-radius:999px;
+  background:radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.55), transparent 60%);
+  opacity:0;
+  transition:opacity 0.35s var(--ease);
+  z-index:-1;
+}
+.btn:hover{
+  transform:translateY(-3px);
+  box-shadow:0 14px 40px -10px rgba(232,163,61,0.7);
+}
+.btn:hover::after{opacity:0.5;}
+.btn:active{transform:translateY(-1px) scale(0.98);}
+
+.btn-ghost{
+  background:transparent;
+  color:var(--c-ivory);
+  border:1px solid var(--c-border);
+  box-shadow:none;
+}
+.btn-ghost:hover{
+  border-color:var(--c-gold);
+  box-shadow:0 0 0 1px var(--c-gold) inset;
+}
+
+/* ===== HERO ===== */
+.hero{
+  position:relative;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  overflow:hidden;
+  padding:140px 24px 60px;
+}
+
+#stars-canvas{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:0;
+}
+
+.beam{
+  position:absolute;
+  left:50%;
+  bottom:-10%;
+  width:140vw;
+  height:140vh;
+  transform:translateX(-50%);
+  background:conic-gradient(from 200deg at 50% 100%,
+    transparent 0deg,
+    rgba(232,163,61,0.16) 6deg,
+    rgba(232,163,61,0.05) 14deg,
+    transparent 22deg,
+    transparent 338deg,
+    rgba(232,163,61,0.05) 346deg,
+    rgba(232,163,61,0.16) 354deg,
+    transparent 360deg);
+  mix-blend-mode:screen;
+  filter:blur(2px);
+  animation:beam-sway 14s ease-in-out infinite;
+  pointer-events:none;
+  z-index:1;
+}
+@keyframes beam-sway{
+  0%,100%{transform:translateX(-50%) rotate(-1.2deg);}
+  50%{transform:translateX(-50%) rotate(1.2deg);}
+}
+
+.screen-glow{
+  position:absolute;
+  top:8%;
+  left:50%;
+  width:520px;
+  height:520px;
+  transform:translateX(-50%);
+  background:radial-gradient(circle, rgba(232,163,61,0.22), transparent 70%);
+  filter:blur(10px);
+  z-index:1;
+  pointer-events:none;
+}
+
+#dust-canvas{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:2;
+  pointer-events:none;
+}
+
+.hero-content{
+  position:relative;
+  z-index:3;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:28px;
+}
+
+.hero-title{
+  font-size:clamp(2.6rem,8vw,6.2rem);
+  letter-spacing:-0.01em;
+  text-wrap:balance;
+}
+.hero-title .by{
+  display:block;
+  font-family:var(--font-body);
+  font-weight:400;
+  font-style:normal;
+  font-size:clamp(1rem,2vw,1.3rem);
+  color:var(--c-gold);
+  margin-top:14px;
+  letter-spacing:0.04em;
+}
+
+.hero-meta{
+  font-size:clamp(1rem,2vw,1.2rem);
+  color:var(--c-muted);
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:center;
+  gap:10px 16px;
+}
+.hero-meta strong{color:var(--c-ivory);font-weight:600;}
+.dot-sep{width:4px;height:4px;border-radius:50%;background:var(--c-lavender);display:inline-block;}
+
+.countdown{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.countdown-item{
+  width:84px;
+  padding:16px 0;
+  border-radius:16px;
+  text-align:center;
+}
+.countdown-num{
+  font-family:var(--font-display);
+  font-size:2rem;
+  font-weight:600;
+  font-variant-numeric:tabular-nums;
+  color:var(--c-gold);
+}
+.countdown-label{
+  font-size:0.7rem;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--c-muted);
+  margin-top:4px;
+}
+
+.scroll-indicator{
+  position:absolute;
+  bottom:32px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:3;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  color:var(--c-muted);
+  font-size:0.75rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+}
+.scroll-indicator svg{animation:bob 2.2s ease-in-out infinite;}
+@keyframes bob{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(8px);}
+}
+
+/* ===== FILM ===== */
+.filmstrip{
+  display:flex;
+  gap:18px;
+  padding:10px 0;
+  overflow:hidden;
+}
+.filmstrip span{
+  width:14px;
+  height:14px;
+  border-radius:4px;
+  background:var(--c-surface);
+  border:1px solid var(--c-border);
+  flex:none;
+}
+
+.film-section{
+  background:linear-gradient(180deg,var(--c-bg),var(--c-surface-2) 50%,var(--c-bg));
+}
+
+.film-grid{
+  display:grid;
+  grid-template-columns:0.85fr 1.15fr;
+  gap:64px;
+  align-items:center;
+  margin-top:60px;
+}
+@media (max-width:900px){
+  .film-grid{grid-template-columns:1fr;gap:48px;}
+}
+
+.poster{
+  position:relative;
+  aspect-ratio:2/3;
+  border-radius:24px;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(232,163,61,0.35), transparent 55%),
+    linear-gradient(160deg,#2c2046,#15101F 70%);
+  border:1px solid var(--c-border);
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 30px 60px -20px rgba(0,0,0,0.6);
+}
+.poster::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(115deg, rgba(255,255,255,0.03) 0 2px, transparent 2px 6px);
+  mix-blend-mode:overlay;
+}
+.poster-title{
+  position:relative;
+  text-align:center;
+  padding:32px;
+  font-family:var(--font-display);
+  font-size:clamp(1.6rem,3vw,2.4rem);
+  color:var(--c-ivory);
+  text-shadow:0 0 40px rgba(232,163,61,0.5);
+}
+.poster-title small{
+  display:block;
+  font-family:var(--font-body);
+  font-size:0.85rem;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--c-gold);
+  margin-top:18px;
+}
+
+.film-tags{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:28px;
+}
+.tag{
+  font-size:0.78rem;
+  letter-spacing:0.06em;
+  padding:8px 16px;
+  border-radius:999px;
+  border:1px solid var(--c-border);
+  color:var(--c-muted);
+}
+
+.film-text p{margin-bottom:18px;color:var(--c-muted);font-size:1.05rem;}
+.film-text p:last-of-type{margin-bottom:0;}
+.film-text strong{color:var(--c-ivory);}
+
+/* ===== SOIREE / TIMELINE ===== */
+.timeline{
+  margin-top:72px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:40px;
+  position:relative;
+}
+.timeline::before{
+  content:'';
+  position:absolute;
+  top:28px;
+  left:8%;
+  right:8%;
+  height:2px;
+  background:repeating-linear-gradient(90deg, var(--c-gold) 0 8px, transparent 8px 18px);
+  opacity:0.5;
+}
+@media (max-width:860px){
+  .timeline{grid-template-columns:1fr;gap:36px;}
+  .timeline::before{display:none;}
+}
+
+.timeline-item{
+  position:relative;
+  text-align:center;
+}
+@media (max-width:860px){
+  .timeline-item{text-align:left;display:flex;gap:20px;align-items:flex-start;}
+}
+
+.timeline-dot{
+  width:56px;
+  height:56px;
+  margin:0 auto 20px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--c-surface);
+  border:1px solid var(--c-border);
+  color:var(--c-gold);
+  position:relative;
+  z-index:1;
+  box-shadow:0 0 0 6px var(--c-bg);
+  flex:none;
+}
+
+.timeline-time{
+  font-family:var(--font-display);
+  font-size:1.6rem;
+  color:var(--c-gold);
+  margin-bottom:6px;
+}
+.timeline-label{font-weight:600;margin-bottom:8px;}
+.timeline-desc{color:var(--c-muted);font-size:0.95rem;}
+
+.info-chips{
+  margin-top:64px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:16px;
+  justify-content:center;
+}
+.info-chip{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:14px 22px;
+  font-size:0.92rem;
+  color:var(--c-muted);
+}
+.info-chip svg{flex:none;color:var(--c-gold);}
+
+/* ===== INFOS PRATIQUES ===== */
+.pratique-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:48px;
+  margin-top:56px;
+  align-items:stretch;
+}
+@media (max-width:900px){
+  .pratique-grid{grid-template-columns:1fr;}
+}
+
+.pratique-list{
+  padding:40px;
+  display:flex;
+  flex-direction:column;
+  gap:26px;
+}
+.pratique-row{
+  display:flex;
+  gap:18px;
+  align-items:flex-start;
+}
+.pratique-icon{
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  background:var(--c-gold-soft);
+  color:var(--c-gold);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:none;
+}
+.pratique-row h3{font-family:var(--font-body);font-size:1.02rem;font-weight:600;margin-bottom:4px;}
+.pratique-row p{color:var(--c-muted);font-size:0.95rem;}
+
+.map-frame{
+  border-radius:var(--radius);
+  overflow:hidden;
+  border:1px solid var(--c-border);
+  min-height:340px;
+}
+.map-frame iframe{width:100%;height:100%;min-height:340px;border:0;display:block;filter:grayscale(0.25) contrast(1.05);}
+
+/* ===== RESERVATION ===== */
+.reservation-section{
+  background:radial-gradient(circle at 50% 0%, rgba(155,134,201,0.12), transparent 60%);
+}
+.gauge-wrap{
+  max-width:560px;
+  margin:48px auto 0;
+  text-align:center;
+}
+.gauge-label{
+  display:flex;
+  justify-content:space-between;
+  font-size:0.85rem;
+  color:var(--c-muted);
+  margin-bottom:10px;
+}
+.gauge-label strong{color:var(--c-ivory);}
+.gauge-track{
+  height:10px;
+  border-radius:999px;
+  background:var(--c-surface);
+  overflow:hidden;
+  border:1px solid var(--c-border);
+}
+.gauge-fill{
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--c-lavender),var(--c-gold));
+  width:0%;
+  transition:width 0.6s var(--ease);
+}
+
+.reservation-card{
+  max-width:680px;
+  margin:48px auto 0;
+  padding:48px;
+}
+@media (max-width:600px){
+  .reservation-card{padding:28px;}
+}
+
+.form-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  margin-bottom:20px;
+}
+@media (max-width:560px){
+  .form-row{grid-template-columns:1fr;}
+}
+
+.field label{
+  display:block;
+  font-size:0.85rem;
+  font-weight:500;
+  margin-bottom:8px;
+  color:var(--c-muted);
+}
+.field input{
+  width:100%;
+  padding:14px 16px;
+  border-radius:12px;
+  border:1px solid var(--c-border);
+  background:rgba(21,16,31,0.6);
+  color:var(--c-ivory);
+  font-family:var(--font-body);
+  font-size:1rem;
+  transition:border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.field input::placeholder{color:rgba(184,175,201,0.5);}
+.field input:focus{
+  outline:none;
+  border-color:var(--c-gold);
+  box-shadow:0 0 0 3px var(--c-gold-soft);
+}
+
+.qty-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:16px 0;
+  border-bottom:1px solid var(--c-border);
+}
+.qty-row:first-of-type{border-top:1px solid var(--c-border);}
+.qty-info strong{display:block;font-size:0.98rem;}
+.qty-info span{color:var(--c-muted);font-size:0.85rem;}
+.qty-control{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.qty-btn{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  border:1px solid var(--c-border);
+  background:var(--c-surface);
+  color:var(--c-ivory);
+  font-size:1.2rem;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:border-color 0.25s var(--ease), transform 0.15s var(--ease);
+  touch-action:manipulation;
+}
+.qty-btn:hover{border-color:var(--c-gold);}
+.qty-btn:active{transform:scale(0.92);}
+.qty-value{
+  width:30px;
+  text-align:center;
+  font-variant-numeric:tabular-nums;
+  font-weight:600;
+}
+
+.total-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  gap:16px;
+  margin-top:28px;
+  padding-top:24px;
+  border-top:1px dashed var(--c-border);
+}
+.total-row span{color:var(--c-muted);}
+.total-row strong{
+  font-family:var(--font-display);
+  font-size:2rem;
+  color:var(--c-gold);
+  white-space:nowrap;
+  flex:none;
+}
+
+.reservation-card .btn{width:100%;margin-top:28px;}
+
+.form-note{
+  margin-top:16px;
+  font-size:0.82rem;
+  color:var(--c-muted);
+  text-align:center;
+}
+
+.confirm-message,.full-message{
+  display:none;
+  text-align:center;
+  padding:20px;
+}
+.confirm-message h3,.full-message h3{margin-bottom:12px;}
+.confirm-message p,.full-message p{color:var(--c-muted);}
+.confirm-icon{
+  width:64px;height:64px;border-radius:50%;
+  background:var(--c-gold-soft);color:var(--c-gold);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;
+}
+
+/* ===== FAQ ===== */
+.faq-list{
+  margin-top:56px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.faq-item{
+  overflow:hidden;
+}
+.faq-question{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:24px 28px;
+  cursor:pointer;
+  list-style:none;
+  font-weight:600;
+  font-size:1.02rem;
+}
+.faq-question::-webkit-details-marker{display:none;}
+.faq-question svg{
+  flex:none;
+  color:var(--c-gold);
+  transition:transform 0.35s var(--ease);
+}
+details[open] .faq-question svg{transform:rotate(45deg);}
+.faq-answer-wrap{
+  display:grid;
+  grid-template-rows:0fr;
+  transition:grid-template-rows 0.35s var(--ease);
+}
+details[open] .faq-answer-wrap{grid-template-rows:1fr;}
+.faq-answer-inner{overflow:hidden;}
+.faq-answer{
+  padding:0 28px 24px;
+  color:var(--c-muted);
+  font-size:0.97rem;
+}
+
+/* ===== FOOTER ===== */
+footer{
+  padding:80px 0 40px;
+  border-top:1px solid var(--c-border);
+}
+.footer-grid{
+  display:grid;
+  grid-template-columns:1.4fr 1fr 1fr;
+  gap:40px;
+  margin-bottom:60px;
+}
+@media (max-width:768px){
+  .footer-grid{grid-template-columns:1fr;gap:36px;}
+}
+.footer-brand{font-family:var(--font-display);font-size:1.3rem;}
+.footer-brand span{color:var(--c-gold);}
+.footer-col h4{
+  font-size:0.78rem;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--c-muted);
+  margin-bottom:16px;
+}
+.footer-col p, .footer-col a{
+  display:block;
+  color:var(--c-muted);
+  text-decoration:none;
+  font-size:0.92rem;
+  margin-bottom:10px;
+}
+.footer-col a:hover{color:var(--c-gold);}
+.footer-bottom{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  gap:12px;
+  font-size:0.82rem;
+  color:var(--c-muted);
+  padding-top:32px;
+  border-top:1px solid var(--c-border);
+}
+
+/* ===== NAV ===== */
+.site-nav{
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:50;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 8px 8px 20px;
+  border-radius:999px;
+}
+.site-nav .brand{
+  font-family:var(--font-display);
+  font-size:1rem;
+  margin-right:10px;
+  white-space:nowrap;
+}
+.site-nav .brand span{color:var(--c-gold);}
+.site-nav .btn{padding:11px 22px;font-size:0.88rem;}
+@media (max-width:640px){
+  .site-nav{top:14px;padding:8px;}
+  .site-nav .brand{display:none;}
+}
+
+.sr-only{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
+
+.skip-link{
+  position:absolute;
+  top:-60px;
+  left:16px;
+  background:var(--c-gold);
+  color:#1A1326;
+  padding:12px 20px;
+  border-radius:10px;
+  z-index:100;
+  font-weight:600;
+  text-decoration:none;
+  transition:top 0.25s var(--ease);
+}
+.skip-link:focus{top:16px;}
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Aller au contenu principal</a>
+
+<nav class="site-nav glass" aria-label="Navigation principale">
+  <span class="brand">Cinéma <span>Plein Air</span></span>
+  <a href="#reservation" class="btn">Réserver</a>
+</nav>
+
+<main id="main">
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <canvas id="stars-canvas" aria-hidden="true"></canvas>
+  <div class="screen-glow" aria-hidden="true"></div>
+  <div class="beam" aria-hidden="true"></div>
+  <canvas id="dust-canvas" aria-hidden="true"></canvas>
+
+  <div class="hero-content">
+    <p class="eyebrow">Cinéma en plein air · Opio</p>
+    <h1 class="hero-title">
+      Un p'tit truc<br>en plus
+      <span class="by">Un film d'Artus</span>
+    </h1>
+    <p class="hero-meta">
+      <strong>Lundi 28 juillet 2026</strong>
+      <span class="dot-sep" aria-hidden="true"></span>
+      <span>Nouvelle place du village, Opio (06650)</span>
+    </p>
+
+    <div class="countdown" id="countdown" aria-label="Compte à rebours avant la séance">
+      <div class="countdown-item glass">
+        <div class="countdown-num" id="cd-days">00</div>
+        <div class="countdown-label">Jours</div>
+      </div>
+      <div class="countdown-item glass">
+        <div class="countdown-num" id="cd-hours">00</div>
+        <div class="countdown-label">Heures</div>
+      </div>
+      <div class="countdown-item glass">
+        <div class="countdown-num" id="cd-min">00</div>
+        <div class="countdown-label">Minutes</div>
+      </div>
+      <div class="countdown-item glass">
+        <div class="countdown-num" id="cd-sec">00</div>
+        <div class="countdown-label">Secondes</div>
+      </div>
+    </div>
+
+    <a href="#reservation" class="btn">Réserver ma place</a>
+  </div>
+
+  <div class="scroll-indicator" aria-hidden="true">
+    <span>Découvrir</span>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  </div>
+</header>
+
+<!-- ================= LE FILM ================= -->
+<section class="film-section" id="film">
+  <div class="filmstrip" aria-hidden="true">
+  </div>
+  <div class="container">
+    <p class="eyebrow" data-aos="fade-up">Le film</p>
+    <h2 class="section-title" data-aos="fade-up" data-aos-delay="80">Une comédie qui fait du bien</h2>
+
+    <div class="film-grid">
+      <div class="poster" data-aos="fade-up">
+        <div class="poster-title">
+          Un p'tit truc<br>en plus
+          <small>Un film d'Artus</small>
+        </div>
+      </div>
+
+      <div class="film-text" data-aos="fade-up" data-aos-delay="120">
+        <p>Pour échapper à la police après un casse raté, un père et son fils trouvent refuge dans une colonie de vacances pas tout à fait comme les autres. Pour passer inaperçus, ils vont devoir s'intégrer auprès des résidents — et c'est là que tout bascule, avec autant de tendresse que d'éclats de rire.</p>
+        <p><strong>Artus</strong>, à la réalisation et au casting, signe une comédie populaire et sincère, portée par des acteurs en situation de handicap mental, saluée pour sa justesse et son humanité.</p>
+        <p>Une séance familiale, sous les étoiles, pour rire ensemble et repartir avec un peu plus de lumière qu'en arrivant.</p>
+        <div class="film-tags">
+          <span class="tag">Comédie</span>
+          <span class="tag">Famille</span>
+          <span class="tag">2024 · 1h39</span>
+          <span class="tag">Tous publics</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="filmstrip" aria-hidden="true">
+  </div>
+</section>
+
+<!-- ================= LA SOIRÉE ================= -->
+<section id="soiree">
+  <div class="container">
+    <p class="eyebrow" data-aos="fade-up">La soirée</p>
+    <h2 class="section-title" data-aos="fade-up" data-aos-delay="80">Le déroulé de la séance</h2>
+    <p class="section-lede" data-aos="fade-up" data-aos-delay="120">Chaises, transats et bonne humeur conseillés. On s'installe avant la nuit, on repart sous les étoiles.</p>
+
+    <div class="timeline">
+      <div class="timeline-item" data-aos="fade-up">
+        <div class="timeline-dot" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 21v-8a4 4 0 014-4h8a4 4 0 014 4v8M4 13V7a2 2 0 012-2h12a2 2 0 012 2v6"/></svg>
+        </div>
+        <div class="timeline-time">21h00</div>
+        <div class="timeline-label">Portes ouvertes</div>
+        <div class="timeline-desc">Installation libre, buvette ouverte, ambiance guirlandes lumineuses.</div>
+      </div>
+
+      <div class="timeline-item" data-aos="fade-up" data-aos-delay="120">
+        <div class="timeline-dot" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7l3 2.5L4 12l3 2.5L4 17M20 7l-3 2.5L20 12l-3 2.5L20 17M9 4h6v16H9z"/></svg>
+        </div>
+        <div class="timeline-time">21h45</div>
+        <div class="timeline-label">Début du film</div>
+        <div class="timeline-desc">Projection d'« Un p'tit truc en plus », sous le ciel d'Opio.</div>
+      </div>
+
+      <div class="timeline-item" data-aos="fade-up" data-aos-delay="240">
+        <div class="timeline-dot" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l1.8 5.6H20l-4.6 3.4 1.8 5.6L12 13.2 6.8 16.6l1.8-5.6L4 7.6h6.2z"/></svg>
+        </div>
+        <div class="timeline-time">~23h30</div>
+        <div class="timeline-label">Fin de séance</div>
+        <div class="timeline-desc">Retour tranquille — pensez à une lampe pour le chemin du retour.</div>
+      </div>
+    </div>
+
+    <div class="info-chips" data-aos="fade-up">
+      <span class="info-chip glass">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 18v-3a4 4 0 014-4h8a4 4 0 014 4v3M4 18h16M6 11V8a2 2 0 012-2h8a2 2 0 012 2v3"/></svg>
+        Chaises et transats bienvenus
+      </span>
+      <span class="info-chip glass">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12c1.5-4 4.5-7 9-7s7.5 3 9 7c-1.5 4-4.5 7-9 7s-7.5-3-9-7z"/><circle cx="12" cy="12" r="2.5"/></svg>
+        Couverture conseillée
+      </span>
+      <span class="info-chip glass">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 10h14l-1 9a2 2 0 01-2 2H8a2 2 0 01-2-2l-1-9zM7 10V6a5 5 0 0110 0v4"/></svg>
+        Buvette sur place
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= INFOS PRATIQUES ================= -->
+<section id="infos" class="film-section">
+  <div class="container">
+    <p class="eyebrow" data-aos="fade-up">Infos pratiques</p>
+    <h2 class="section-title" data-aos="fade-up" data-aos-delay="80">Tout ce qu'il faut savoir</h2>
+
+    <div class="pratique-grid">
+      <div class="pratique-list glass" data-aos="fade-up">
+        <div class="pratique-row">
+          <span class="pratique-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-6.2-7-11.2A7 7 0 0112 3a7 7 0 017 6.8C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.8" r="2.4"/></svg>
+          </span>
+          <div>
+            <h3>Nouvelle place du village, Opio (06650)</h3>
+            <p>Alpes-Maritimes, en plein cœur du village — accès à pied conseillé.</p>
+          </div>
+        </div>
+        <div class="pratique-row">
+          <span class="pratique-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M7 7V5a2 2 0 012-2h6a2 2 0 012 2v2M3 12h18"/></svg>
+          </span>
+          <div>
+            <h3>Parking à proximité</h3>
+            <p>Places disponibles autour du village, à quelques minutes à pied.</p>
+          </div>
+        </div>
+        <div class="pratique-row">
+          <span class="pratique-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2"/><path d="M12 8v6m0 0l-4 7m4-7l4 7M7 12l5-1 5 1"/></svg>
+          </span>
+          <div>
+            <h3>Accessibilité</h3>
+            <p>Place plane et accessible aux personnes à mobilité réduite.</p>
+          </div>
+        </div>
+        <div class="pratique-row">
+          <span class="pratique-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6.5" cy="6" r="1.6"/><circle cx="11" cy="4.5" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="18" cy="9.5" r="1.6"/><path d="M9 21c-1.5 0-2.6-1.4-2.1-2.9l.8-2.4a3 3 0 012.8-2h3a3 3 0 012.9 2.2l.6 2.2c.4 1.5-.7 2.9-2.2 2.9z"/></svg>
+          </span>
+          <div>
+            <h3>Animaux acceptés</h3>
+            <p>Vos compagnons sont les bienvenus, tenus en laisse pendant la séance.</p>
+          </div>
+        </div>
+        <div class="pratique-row">
+          <span class="pratique-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7l-9 9-5-5"/></svg>
+          </span>
+          <div>
+            <h3>À apporter</h3>
+            <p>Transat ou plaid, une petite laine pour la fraîcheur du soir, et votre bonne humeur.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-frame glass" data-aos="fade-up" data-aos-delay="120">
+        <iframe
+          src="https://www.google.com/maps?q=Place+du+Village,+Opio,+06650&output=embed"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Carte — Nouvelle place du village, Opio"
+          aria-label="Carte Google Maps centrée sur Opio">
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= RÉSERVATION ================= -->
+<section id="reservation" class="reservation-section">
+  <div class="container">
+    <p class="eyebrow" data-aos="fade-up">Réservation</p>
+    <h2 class="section-title" data-aos="fade-up" data-aos-delay="80">Réservez votre place</h2>
+    <p class="section-lede" data-aos="fade-up" data-aos-delay="120">Réservation simple, sans paiement en ligne — le règlement se fait sur place. Jauge limitée à 150 personnes.</p>
+
+    <div class="gauge-wrap" data-aos="fade-up">
+      <div class="gauge-label">
+        <span>Places réservées</span>
+        <strong id="gauge-text">0 / 150</strong>
+      </div>
+      <div class="gauge-track">
+        <div class="gauge-fill" id="gauge-fill"></div>
+      </div>
+    </div>
+
+    <div class="reservation-card glass" data-aos="fade-up" data-aos-delay="160">
+
+      <form id="reservation-form" name="reservation">
+        <div class="form-row">
+          <div class="field">
+            <label for="prenom">Prénom</label>
+            <input type="text" id="prenom" name="prenom" autocomplete="given-name" required>
+          </div>
+          <div class="field">
+            <label for="nom">Nom</label>
+            <input type="text" id="nom" name="nom" autocomplete="family-name" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="telephone">Téléphone</label>
+            <input type="tel" id="telephone" name="telephone" autocomplete="tel" required>
+          </div>
+        </div>
+
+        <div class="qty-row">
+          <div class="qty-info">
+            <strong>Adultes</strong>
+            <span>+ de 10 ans · 5 €</span>
+          </div>
+          <div class="qty-control">
+            <button type="button" class="qty-btn" data-target="adultes" data-step="-1" aria-label="Retirer un adulte">–</button>
+            <span class="qty-value" id="adultes-value">0</span>
+            <button type="button" class="qty-btn" data-target="adultes" data-step="1" aria-label="Ajouter un adulte">+</button>
+          </div>
+        </div>
+        <input type="number" id="adultes" name="nb_adultes" min="0" value="0" class="sr-only" aria-hidden="true" tabindex="-1">
+
+        <div class="qty-row">
+          <div class="qty-info">
+            <strong>Enfants 3 à 10 ans</strong>
+            <span>3 €</span>
+          </div>
+          <div class="qty-control">
+            <button type="button" class="qty-btn" data-target="enfants" data-step="-1" aria-label="Retirer un enfant de 3 à 10 ans">–</button>
+            <span class="qty-value" id="enfants-value">0</span>
+            <button type="button" class="qty-btn" data-target="enfants" data-step="1" aria-label="Ajouter un enfant de 3 à 10 ans">+</button>
+          </div>
+        </div>
+        <input type="number" id="enfants" name="nb_enfants_3_10" min="0" value="0" class="sr-only" aria-hidden="true" tabindex="-1">
+
+        <div class="qty-row">
+          <div class="qty-info">
+            <strong>Enfants moins de 3 ans</strong>
+            <span>Gratuit — à déclarer quand même</span>
+          </div>
+          <div class="qty-control">
+            <button type="button" class="qty-btn" data-target="bebes" data-step="-1" aria-label="Retirer un enfant de moins de 3 ans">–</button>
+            <span class="qty-value" id="bebes-value">0</span>
+            <button type="button" class="qty-btn" data-target="bebes" data-step="1" aria-label="Ajouter un enfant de moins de 3 ans">+</button>
+          </div>
+        </div>
+        <input type="number" id="bebes" name="nb_enfants_moins_3" min="0" value="0" class="sr-only" aria-hidden="true" tabindex="-1">
+
+        <div style="position:absolute;left:-9999px;top:-9999px" aria-hidden="true">
+          <label for="hp-field">Ne pas remplir ce champ</label>
+          <input type="text" id="hp-field" name="hp" tabindex="-1" autocomplete="off">
+        </div>
+
+        <div class="total-row">
+          <span>Montant estimé, à régler sur place</span>
+          <strong id="total-price">0 €</strong>
+        </div>
+
+        <button type="submit" class="btn" id="submit-btn">Réserver ma place</button>
+        <p class="form-note">Aucun paiement en ligne. Vous réglerez sur place le soir de la projection.</p>
+      </form>
+
+      <div class="confirm-message" id="confirm-message">
+        <div class="confirm-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7L9 18l-5-5"/></svg>
+        </div>
+        <h3>Réservation enregistrée</h3>
+        <p>Merci ! Votre place est réservée pour le 28 juillet 2026. Le règlement se fera sur place. À très vite sous les étoiles d'Opio !</p>
+      </div>
+
+      <div class="full-message" id="full-message">
+        <div class="confirm-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg>
+        </div>
+        <h3>Complet</h3>
+        <p>La jauge de 150 places est atteinte. Une liste d'attente sera ouverte directement sur place le soir de l'événement.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section id="faq" class="film-section">
+  <div class="container">
+    <p class="eyebrow" data-aos="fade-up">Questions fréquentes</p>
+    <h2 class="section-title" data-aos="fade-up" data-aos-delay="80">Tout ce que vous vous demandez</h2>
+
+    <div class="faq-list">
+      <details class="faq-item glass" data-aos="fade-up">
+        <summary class="faq-question">
+          Que se passe-t-il en cas de pluie ?
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </summary>
+        <div class="faq-answer-wrap"><div class="faq-answer-inner"><p class="faq-answer">En cas de météo défavorable, la décision est prise en fin d'après-midi le jour J. La séance peut être reportée ou annulée — l'information sera communiquée par email aux personnes inscrites et affichée sur place.</p></div></div>
+      </details>
+
+      <details class="faq-item glass" data-aos="fade-up">
+        <summary class="faq-question">
+          Peut-on venir sans réserver ?
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </summary>
+        <div class="faq-answer-wrap"><div class="faq-answer-inner"><p class="faq-answer">Oui, dans la limite des places disponibles le soir même. La réservation en ligne permet simplement de garantir votre place puisque la jauge est limitée à 150 personnes.</p></div></div>
+      </details>
+
+      <details class="faq-item glass" data-aos="fade-up">
+        <summary class="faq-question">
+          Les animaux sont-ils acceptés ?
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </summary>
+        <div class="faq-answer-wrap"><div class="faq-answer-inner"><p class="faq-answer">Oui, les animaux sont les bienvenus, tenus en laisse pendant la séance.</p></div></div>
+      </details>
+
+      <details class="faq-item glass" data-aos="fade-up">
+        <summary class="faq-question">
+          Y a-t-il un remboursement si on ne peut pas venir ?
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </summary>
+        <div class="faq-answer-wrap"><div class="faq-answer-inner"><p class="faq-answer">La réservation se fait sans paiement en ligne et le règlement a lieu sur place : il n'y a donc rien à rembourser. Si vous ne pouvez finalement pas venir, merci simplement de prévenir le comité des fêtes pour libérer votre place.</p></div></div>
+      </details>
+
+      <details class="faq-item glass" data-aos="fade-up">
+        <summary class="faq-question">
+          Peut-on apporter à manger et à boire ?
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </summary>
+        <div class="faq-answer-wrap"><div class="faq-answer-inner"><p class="faq-answer">Bien sûr, le pique-nique est le bienvenu. Une buvette tenue par le comité des fêtes sera également ouverte sur place toute la soirée.</p></div></div>
+      </details>
+
+      <details class="faq-item glass" data-aos="fade-up">
+        <summary class="faq-question">
+          Faut-il apporter sa propre installation ?
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </summary>
+        <div class="faq-answer-wrap"><div class="faq-answer-inner"><p class="faq-answer">Oui, il n'y a pas de chaises fournies : pensez à votre transat, plaid ou chaise pliante, ainsi qu'une couverture pour la fraîcheur du soir.</p></div></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <p class="footer-brand">Cinéma <span>Plein Air</span> · Opio</p>
+        <p style="color:var(--c-muted);margin-top:16px;max-width:360px;font-size:0.92rem;">Une projection en plein air organisée par le Comité des fêtes d'Opio, au cœur des Alpes-Maritimes, pour une soirée de cinéma sous les étoiles.</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Organisation</h4>
+        <p>Comité des fêtes d'Opio</p>
+        <p>Nouvelle place du village, Opio (06650)</p>
+        <a href="mailto:Oria.ei@outlook.fr">Oria.ei@outlook.fr</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Prestation technique</h4>
+        <p>Oria — Raphaël Lambert EI</p>
+        <p>Projection &amp; sonorisation plein air</p>
+        <p>Projection en plein air déclarée — autorisation CNC en cours</p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 Comité des fêtes d'Opio — Tous droits réservés</span>
+      <span>Site sans cookies ni traceurs · Conçu et réalisé par Oria</span>
+    </div>
+  </div>
+</footer>
+
+</main>
+
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- AOS ---------- */
+  if (window.AOS) {
+    AOS.init({
+      once: true,
+      duration: 700,
+      easing: 'ease-out-cubic',
+      offset: 60,
+      disable: function () {
+        return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      }
+    });
+  }
+
+  /* ---------- Countdown ---------- */
+  var EVENT_DATE = new Date(2026, 6, 28, 21, 0, 0); // 28 juillet 2026, 21h00
+
+  var cdDays = document.getElementById('cd-days');
+  var cdHours = document.getElementById('cd-hours');
+  var cdMin = document.getElementById('cd-min');
+  var cdSec = document.getElementById('cd-sec');
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function updateCountdown() {
+    var now = new Date();
+    var diff = EVENT_DATE - now;
+    if (diff <= 0) {
+      cdDays.textContent = '00';
+      cdHours.textContent = '00';
+      cdMin.textContent = '00';
+      cdSec.textContent = '00';
+      return;
+    }
+    var days = Math.floor(diff / 86400000);
+    var hours = Math.floor((diff % 86400000) / 3600000);
+    var mins = Math.floor((diff % 3600000) / 60000);
+    var secs = Math.floor((diff % 60000) / 1000);
+    cdDays.textContent = pad(days);
+    cdHours.textContent = pad(hours);
+    cdMin.textContent = pad(mins);
+    cdSec.textContent = pad(secs);
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  /* ---------- Starfield canvas ---------- */
+  var starsCanvas = document.getElementById('stars-canvas');
+  var starsCtx = starsCanvas.getContext('2d');
+  var stars = [];
+
+  function resizeStars() {
+    starsCanvas.width = starsCanvas.offsetWidth * devicePixelRatio;
+    starsCanvas.height = starsCanvas.offsetHeight * devicePixelRatio;
+    var count = Math.floor((starsCanvas.offsetWidth * starsCanvas.offsetHeight) / 9000);
+    stars = [];
+    for (var i = 0; i < count; i++) {
+      stars.push({
+        x: Math.random() * starsCanvas.width,
+        y: Math.random() * starsCanvas.height * 0.85,
+        r: Math.random() * 1.3 + 0.3,
+        phase: Math.random() * Math.PI * 2,
+        speed: Math.random() * 0.015 + 0.005
+      });
+    }
+  }
+
+  function drawStars(t) {
+    starsCtx.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
+    for (var i = 0; i < stars.length; i++) {
+      var s = stars[i];
+      var twinkle = prefersReducedMotion ? 0.7 : 0.5 + 0.5 * Math.sin(t * s.speed + s.phase);
+      starsCtx.beginPath();
+      starsCtx.arc(s.x, s.y, s.r * devicePixelRatio, 0, Math.PI * 2);
+      starsCtx.fillStyle = 'rgba(246,241,231,' + (0.25 + twinkle * 0.55).toFixed(2) + ')';
+      starsCtx.fill();
+    }
+  }
+
+  function starsLoop(t) {
+    drawStars(t || 0);
+    if (!prefersReducedMotion) requestAnimationFrame(starsLoop);
+  }
+
+  resizeStars();
+  starsLoop(0);
+  window.addEventListener('resize', resizeStars);
+
+  /* ---------- Dust particles (projector beam) ---------- */
+  var dustCanvas = document.getElementById('dust-canvas');
+  var dustCtx = dustCanvas.getContext('2d');
+  var dust = [];
+
+  function resizeDust() {
+    dustCanvas.width = dustCanvas.offsetWidth * devicePixelRatio;
+    dustCanvas.height = dustCanvas.offsetHeight * devicePixelRatio;
+    var count = prefersReducedMotion ? 0 : 60;
+    dust = [];
+    for (var i = 0; i < count; i++) {
+      dust.push(makeDustParticle(true));
+    }
+  }
+
+  function makeDustParticle(randomY) {
+    var cx = dustCanvas.width * 0.5;
+    var spread = dustCanvas.width * 0.32;
+    return {
+      x: cx + (Math.random() - 0.5) * spread,
+      y: randomY ? Math.random() * dustCanvas.height : dustCanvas.height + 10,
+      r: Math.random() * 1.8 + 0.5,
+      vy: Math.random() * 0.35 + 0.18,
+      vx: (Math.random() - 0.5) * 0.18,
+      alpha: Math.random() * 0.35 + 0.15
+    };
+  }
+
+  function drawDust() {
+    dustCtx.clearRect(0, 0, dustCanvas.width, dustCanvas.height);
+    for (var i = 0; i < dust.length; i++) {
+      var d = dust[i];
+      d.y -= d.vy * devicePixelRatio;
+      d.x += d.vx * devicePixelRatio;
+      dustCtx.beginPath();
+      dustCtx.arc(d.x, d.y, d.r * devicePixelRatio, 0, Math.PI * 2);
+      dustCtx.fillStyle = 'rgba(232,163,61,' + d.alpha.toFixed(2) + ')';
+      dustCtx.fill();
+      if (d.y < -10) {
+        dust[i] = makeDustParticle(false);
+      }
+    }
+  }
+
+  function dustLoop() {
+    drawDust();
+    requestAnimationFrame(dustLoop);
+  }
+
+  resizeDust();
+  if (!prefersReducedMotion) {
+    dustLoop();
+  }
+  window.addEventListener('resize', resizeDust);
+
+  /* ---------- Magnetic glow buttons ---------- */
+  if (!prefersReducedMotion) {
+    document.querySelectorAll('.btn').forEach(function (btn) {
+      btn.addEventListener('mousemove', function (e) {
+        var rect = btn.getBoundingClientRect();
+        var mx = ((e.clientX - rect.left) / rect.width) * 100;
+        var my = ((e.clientY - rect.top) / rect.height) * 100;
+        btn.style.setProperty('--mx', mx + '%');
+        btn.style.setProperty('--my', my + '%');
+      });
+    });
+  }
+
+})();
+</script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import {
+    getFirestore, doc, onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+  import {
+    getFunctions, httpsCallable
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-functions.js";
+
+  var firebaseConfig = {
+    apiKey: "AIzaSyBB-WiFkZfrHQD9rXDQ6KjbeNQyMlO4VbA",
+    authDomain: "cinema-en-pleine-air-opi-ac81e.firebaseapp.com",
+    projectId: "cinema-en-pleine-air-opi-ac81e",
+    storageBucket: "cinema-en-pleine-air-opi-ac81e.firebasestorage.app",
+    messagingSenderId: "245777069404",
+    appId: "1:245777069404:web:8478506b55ec08fb8abd99"
+  };
+
+  var app = initializeApp(firebaseConfig);
+  var db = getFirestore(app);
+  var functions = getFunctions(app);
+  var createReservation = httpsCallable(functions, 'createReservation');
+
+  var MAX_PLACES = 150;
+  var MAX_PER_RESERVATION = 10;
+  var PRICE_ADULTE = 5;
+  var PRICE_ENFANT = 3;
+
+  var qty = { adultes: 0, enfants: 0, bebes: 0 };
+  var qtyValueEls = {
+    adultes: document.getElementById('adultes-value'),
+    enfants: document.getElementById('enfants-value'),
+    bebes: document.getElementById('bebes-value')
+  };
+  var qtyInputEls = {
+    adultes: document.getElementById('adultes'),
+    enfants: document.getElementById('enfants'),
+    bebes: document.getElementById('bebes')
+  };
+  var totalPriceEl = document.getElementById('total-price');
+  var gaugeFillEl = document.getElementById('gauge-fill');
+  var gaugeTextEl = document.getElementById('gauge-text');
+  var form = document.getElementById('reservation-form');
+  var confirmMessage = document.getElementById('confirm-message');
+  var fullMessage = document.getElementById('full-message');
+  var submitBtn = document.getElementById('submit-btn');
+
+  var currentReserved = 0;
+
+  function totalRequested() {
+    return qty.adultes + qty.enfants + qty.bebes;
+  }
+
+  function updatePrice() {
+    var total = qty.adultes * PRICE_ADULTE + qty.enfants * PRICE_ENFANT;
+    totalPriceEl.textContent = total + ' €';
+  }
+
+  function renderGauge(reserved) {
+    currentReserved = reserved;
+    var remaining = Math.max(0, MAX_PLACES - reserved);
+    var pct = Math.min(100, (reserved / MAX_PLACES) * 100);
+    gaugeFillEl.style.width = pct + '%';
+    gaugeTextEl.textContent = reserved + ' / ' + MAX_PLACES;
+
+    if (remaining <= 0) {
+      form.style.display = 'none';
+      confirmMessage.style.display = 'none';
+      fullMessage.style.display = 'block';
+    }
+  }
+
+  onSnapshot(doc(db, 'meta', 'gauge'), function (snap) {
+    var data = snap.data();
+    renderGauge(data ? data.reserved : 0);
+  });
+
+  document.querySelectorAll('.qty-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var target = btn.getAttribute('data-target');
+      var step = parseInt(btn.getAttribute('data-step'), 10);
+      var next = qty[target] + step;
+      if (next < 0) return;
+
+      var remaining = MAX_PLACES - currentReserved;
+      if (step > 0 && (totalRequested() + 1 > remaining || totalRequested() + 1 > MAX_PER_RESERVATION)) return;
+
+      qty[target] = next;
+      qtyValueEls[target].textContent = next;
+      qtyInputEls[target].value = next;
+      updatePrice();
+    });
+  });
+
+  updatePrice();
+
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      if (totalRequested() <= 0) {
+        alert('Merci de sélectionner au moins une place avant de réserver.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Envoi en cours…';
+
+      createReservation({
+        prenom: form.prenom.value.trim(),
+        nom: form.nom.value.trim(),
+        email: form.email.value.trim(),
+        telephone: form.telephone.value.trim(),
+        nb_adultes: qty.adultes,
+        nb_enfants_3_10: qty.enfants,
+        nb_enfants_moins_3: qty.bebes,
+        hp: form.hp.value
+      }).then(function () {
+        form.style.display = 'none';
+        confirmMessage.style.display = 'block';
+      }).catch(function (err) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Réserver ma place';
+        if (err && err.code === 'resource-exhausted') {
+          form.style.display = 'none';
+          fullMessage.style.display = 'block';
+        } else {
+          alert("Impossible d'envoyer votre réservation, réessayez.");
+        }
+      });
+    });
+  }
+</script>
+</body>
+</html>
