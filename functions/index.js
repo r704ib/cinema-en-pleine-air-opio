@@ -5,6 +5,7 @@ const { onDocumentCreated, onDocumentUpdated } = require("firebase-functions/v2/
 const { defineSecret } = require("firebase-functions/params");
 const logger = require("firebase-functions/logger");
 const admin = require("firebase-admin");
+const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { validateReservationInput, MAX_PLACES } = require("./reservation-logic");
 const {
   buildVisitorConfirmationEmail,
@@ -13,7 +14,7 @@ const {
 } = require("./email-content");
 
 admin.initializeApp();
-const db = admin.firestore();
+const db = getFirestore();
 
 const BREVO_API_KEY = defineSecret("BREVO_API_KEY");
 const SENDER = { name: "Cinéma en plein air Opio", email: "Oria.ei@outlook.fr" };
@@ -55,13 +56,13 @@ exports.createReservation = onCall(async (request) => {
       throw new HttpsError("resource-exhausted", "FULL");
     }
     tx.set(reservationRef, Object.assign({}, result.reservation, {
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     }));
     tx.set(
       gaugeRef,
       {
         reserved: reserved + result.reservation.totalPlaces,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
       },
       { merge: true }
     );
@@ -91,13 +92,13 @@ exports.cancelReservation = onCall(async (request) => {
 
     tx.update(reservationRef, {
       status: "cancelled",
-      cancelledAt: admin.firestore.FieldValue.serverTimestamp(),
+      cancelledAt: FieldValue.serverTimestamp(),
     });
     tx.set(
       gaugeRef,
       {
         reserved: Math.max(0, reserved - totalPlaces),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
       },
       { merge: true }
     );
