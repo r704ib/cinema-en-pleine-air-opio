@@ -1,0 +1,14 @@
+# Notes de version
+
+Une note par version déployée, numérotée `v1`, `v2`, `v3`…
+La plus récente est tout en haut de la liste ci-dessous.
+
+À chaque nouveau déploiement en ligne, un fichier `releases/vN.md` est ajouté,
+décrivant ce qui a changé (date, nouveautés, corrections).
+
+Ce dossier n'est pas publié sur le site (il reste dans le dépôt, à usage
+interne) — seul le contenu de `public/` est servi aux visiteurs.
+
+## Versions
+
+- [v1](v1.md) — 2026-06-18 — Migration Firebase : jauge partagée en temps réel, réservation et annulation en ligne.
