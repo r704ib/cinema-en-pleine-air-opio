@@ -1,7 +1,21 @@
 # Jauge de réservation partagée via Firebase
 
-Date : 2026-06-17
+Date : 2026-06-17 (révisé le 2026-06-18 : écritures déplacées côté serveur, voir note ci-dessous)
 Statut : approuvé, en attente du plan d'implémentation
+
+> **Révision du 2026-06-18** : la revue de la Tâche 3 a démontré que des
+> règles Firestore basées sur la confiance du client (le client écrit
+> directement `reservations` et `meta/gauge`, les règles bornent juste
+> chaque écriture individuellement) ne peuvent pas garantir le plafond de
+> 150 places : un client malveillant peut écrire dans l'une des deux
+> collections sans toucher à l'autre, désynchronisant la jauge affichée du
+> nombre réel de réservations actives. La création et l'annulation de
+> réservation passent donc désormais par des **Cloud Functions "callable"**
+> (code serveur de confiance, jamais exécuté ni modifiable côté client) qui
+> sont les seules autorisées à écrire dans `reservations` et `meta/gauge`.
+> Les règles Firestore client deviennent : lecture publique, écriture
+> refusée (`allow create, update, delete: if false`). Le reste de la
+> conception (modèle de données, emails, jauge en temps réel) est inchangé.
 
 ## Contexte
 
@@ -40,11 +54,15 @@ visiteurs, alimentée par de vraies réservations stockées côté serveur, avec
 ```
 Navigateur visiteur
    │
-   ├─► Firestore (écriture directe via SDK JS, sécurisée par règles)
-   │      ├─ collection "reservations" (un document par réservation)
-   │      └─ document "meta/gauge" (compteur total, lu en temps réel par tous)
+   ├─► Cloud Function callable "createReservation" ─┐
+   ├─► Cloud Function callable "cancelReservation"  ─┤
+   │                                                  ▼
+   │                                  Transaction Firestore (Admin SDK,
+   │                                  immune aux règles client) :
+   │                                  écrit "reservations/{id}" et
+   │                                  incrémente/décrémente "meta/gauge"
    │
-   └─► (lecture) onSnapshot sur "meta/gauge" → jauge mise à jour en direct
+   └─► (lecture seule) onSnapshot sur "meta/gauge" → jauge mise à jour en direct
 
 Firestore (trigger automatique, indépendant du navigateur)
    │
@@ -55,13 +73,19 @@ Firestore (trigger automatique, indépendant du navigateur)
 Lien d'annulation (envoyé par email au visiteur)
    │
    └─► Page "annuler.html?id=<id-du-document>"
-          └─► Transaction Firestore : statut → "cancelled", décrément de la jauge
+          └─► Appelle la Cloud Function "cancelReservation"
 ```
 
-Aucun serveur applicatif à maintenir : les écritures/lectures passent par le
-SDK Firebase JS côté client (sécurisées par les règles Firestore), à
-l'exception de l'envoi d'email qui passe par des Cloud Functions afin de
-garder la clé API Brevo secrète (jamais exposée côté client).
+Le client ne lit Firestore que pour la jauge (`meta/gauge`, lecture seule —
+les règles refusent toute écriture client). Toute écriture (création ou
+annulation d'une réservation) passe par une Cloud Function callable, qui
+s'exécute côté serveur avec les privilèges Admin SDK : c'est le seul endroit
+où le plafond de 150 places et la limite de 10 places/réservation sont
+réellement garantis, puisque ce code n'est jamais sous le contrôle du
+visiteur. L'envoi d'email reste géré par des Cloud Functions déclenchées par
+les écritures Firestore, comme avant — ces écritures passant maintenant par
+l'Admin SDK plutôt que par le client, elles déclenchent les triggers Firestore
+exactement de la même façon.
 
 ## Modèle de données Firestore
 
@@ -99,70 +123,80 @@ mise en place du projet Firebase.
 
 ### Règles de sécurité Firestore (résumé fonctionnel)
 
-- **Création d'une réservation** (`reservations/{id}`, `create`) : autorisée
-  uniquement si :
-  - `totalPlaces` est un entier entre 1 et 10 et égal à la somme des 3
-    quantités fournies ;
-  - `hp` est une chaîne vide ;
-  - `prenom`, `nom`, `email`, `telephone` sont des chaînes non vides ;
-  - `status` vaut `"active"` ;
-  - la même requête met à jour `meta/gauge.reserved` en l'incrémentant
-    exactement de `totalPlaces`, sans dépasser 150.
-- **Annulation** (`reservations/{id}`, `update`) : autorisée uniquement si :
-  - le document existe et son `status` actuel est `"active"` ;
-  - les seuls champs modifiés sont `status` (→ `"cancelled"`) et
-    `cancelledAt` ;
-  - la même requête décrémente `meta/gauge.reserved` de `totalPlaces`.
-- **`meta/gauge`** : lecture publique libre ; écriture uniquement dans le
-  cadre des deux transactions ci-dessus (jamais de modification arbitraire
-  directe par un client).
-- Aucune lecture publique de la collection `reservations` dans son ensemble
-  (un client ne peut lire un document de réservation que s'il en connaît déjà
-  l'ID — utile pour la page d'annulation, mais empêche de lister les
-  réservations des autres visiteurs).
+Toute la validation (formats, plafond de 150, maximum 10 places/réservation,
+honeypot) est désormais faite côté serveur dans les Cloud Functions callable
+(voir plus bas), pas dans les règles. Les règles se contentent de fermer
+l'accès en écriture direct :
+
+- **`reservations/{id}`** : `allow get: if true;` (un client peut lire un
+  document s'il en connaît déjà l'ID — utile pour la page d'annulation) ;
+  `allow list: if false;` (impossible de lister les réservations des autres
+  visiteurs) ; `allow create, update, delete: if false;` (toute écriture
+  passe par l'Admin SDK depuis une Cloud Function, qui ignore les règles
+  Firestore par conception — un client ne peut donc jamais écrire ce
+  document directement).
+- **`meta/gauge`** : `allow get: if true;` (lecture publique pour la jauge
+  en temps réel) ; `allow write: if false;` (même raisonnement : seule une
+  Cloud Function, via l'Admin SDK, peut le modifier).
 
 ## Flux de réservation
 
 1. Le visiteur remplit le formulaire existant (prénom, nom, email, téléphone,
    quantités via les boutons +/-).
-2. Au clic sur « Réserver ma place », le JS du site lance une **transaction
-   Firestore** qui :
-   - lit `meta/gauge.reserved` ;
-   - vérifie que `reserved + totalPlaces ≤ 150` ;
-   - si oui : crée le document `reservations` (`status: "active"`) et
-     incrémente `meta/gauge.reserved` du même montant, en une seule opération
-     atomique.
-3. Si la transaction réussit : le formulaire est remplacé par le message de
-   confirmation existant. La Cloud Function `onReservationCreated` se déclenche
-   en arrière-plan et envoie les emails (voir plus bas).
-4. Si la transaction échoue car la jauge est désormais pleine (quelqu'un
-   d'autre a réservé les dernières places entre-temps) : le formulaire est
-   remplacé par le message « jauge atteinte » déjà existant sur le site.
-5. En cas d'erreur réseau/Firestore (pas de connexion, etc.) : un message
-   d'erreur clair est affiché (« Impossible d'envoyer votre réservation,
-   réessayez. ») et le bouton de soumission est réactivé pour permettre une
-   nouvelle tentative.
+2. Au clic sur « Réserver ma place », le JS du site appelle la Cloud Function
+   callable **`createReservation`** avec les données du formulaire (y compris
+   le champ honeypot).
+3. Côté serveur, la fonction :
+   - valide les champs (formats, `totalPlaces` entre 1 et 10, honeypot vide) ;
+   - lit `meta/gauge.reserved` et vérifie que `reserved + totalPlaces ≤ 150` ;
+   - si tout est valide : crée le document `reservations` (`status: "active"`)
+     et incrémente `meta/gauge.reserved` du même montant, en une seule
+     transaction Firestore (Admin SDK).
+4. Si l'appel réussit : le formulaire est remplacé par le message de
+   confirmation existant. L'écriture déclenche en parallèle la Cloud Function
+   `onReservationCreated` (trigger Firestore), qui envoie les emails (voir
+   plus bas).
+5. Si la fonction renvoie une erreur "jauge pleine" (quelqu'un d'autre a
+   réservé les dernières places entre-temps, ou la demande dépasse la place
+   restante) : le formulaire est remplacé par le message « jauge atteinte »
+   déjà existant sur le site.
+6. En cas d'erreur réseau ou d'échec de l'appel (pas de connexion, etc.) : un
+   message d'erreur clair est affiché (« Impossible d'envoyer votre
+   réservation, réessayez. ») et le bouton de soumission est réactivé pour
+   permettre une nouvelle tentative.
 
 ## Flux d'annulation
 
 1. Le visiteur reçoit par email (voir plus bas) un lien personnel de la forme
    `https://<domaine-du-site>/annuler.html?id=<id-du-document>`.
 2. La page `annuler.html` (nouvelle page statique du site) lit le paramètre
-   `id`, charge le document `reservations/{id}` correspondant et affiche un
-   récapitulatif (« Annuler la réservation de 4 places au nom de Jean
-   Dupont ? ») avec un bouton de confirmation.
+   `id`, charge le document `reservations/{id}` correspondant (lecture seule,
+   autorisée par les règles) et affiche un récapitulatif (« Annuler la
+   réservation de 4 places au nom de Jean Dupont ? ») avec un bouton de
+   confirmation.
 3. Si l'`id` n'existe pas ou que le statut est déjà `"cancelled"` : un message
    clair est affiché (« Cette réservation est introuvable ou a déjà été
    annulée. ») plutôt qu'une erreur technique brute.
-4. Au clic sur le bouton de confirmation, une transaction Firestore passe le
-   `status` du document à `"cancelled"`, renseigne `cancelledAt`, et
-   décrémente `meta/gauge.reserved` du `totalPlaces` correspondant — atomique.
+4. Au clic sur le bouton de confirmation, le JS appelle la Cloud Function
+   callable **`cancelReservation`** avec l'`id`. Côté serveur, la fonction
+   vérifie que la réservation existe et est `"active"`, puis passe son
+   `status` à `"cancelled"`, renseigne `cancelledAt`, et décrémente
+   `meta/gauge.reserved` du `totalPlaces` correspondant — toujours en une
+   seule transaction Firestore (Admin SDK).
 5. Une confirmation s'affiche sur la page. La jauge se met à jour en temps
-   réel chez tous les visiteurs ayant le site ouvert. La Cloud Function
-   `onReservationCancelled` se déclenche en arrière-plan et notifie le
-   comité.
+   réel chez tous les visiteurs ayant le site ouvert. L'écriture déclenche la
+   Cloud Function `onReservationCancelled` (trigger Firestore), qui notifie
+   le comité.
 
-## Notifications email (Cloud Functions + Brevo)
+## Cloud Functions
+
+Quatre Cloud Functions au total :
+- **`createReservation`** et **`cancelReservation`** (callable, voir
+  ci-dessus) : seules autorisées à écrire `reservations` et `meta/gauge`.
+- **`onReservationCreated`** et **`onReservationCancelled`** (triggers
+  Firestore, inchangées) : envoient les emails, décrites ci-dessous.
+
+### Notifications email (Brevo)
 
 Deux Cloud Functions Firebase, déclenchées automatiquement par les écritures
 Firestore (donc fiables même si le visiteur ferme son onglet juste après son
@@ -226,9 +260,9 @@ par Firebase) :
   affiché, bouton réactivé, aucune donnée locale perdue (les valeurs saisies
   restent dans le formulaire).
 - **Jauge pleine au moment de la soumission** : détecté par la transaction
-  Firestore elle-même (pas seulement par une vérification optimiste côté
-  client avant l'envoi), donc fiable même en cas de réservations
-  quasi-simultanées.
+  Firestore exécutée côté serveur dans `createReservation` (pas seulement
+  par une vérification optimiste côté client avant l'appel), donc fiable
+  même en cas de réservations quasi-simultanées.
 - **Lien d'annulation invalide ou déjà utilisé** : message clair sur la page
   `annuler.html`, pas d'erreur technique brute affichée au visiteur.
 
@@ -239,8 +273,8 @@ par Firebase) :
 - Réservation qui amène exactement la jauge à 150 : acceptée.
 - Tentative de réservation au-delà de 150 (jauge déjà pleine ou dépassement
   par la demande) : refusée, message « jauge atteinte » affiché.
-- Tentative de réservation de plus de 10 places en une fois : refusée par les
-  règles Firestore.
+- Tentative de réservation de plus de 10 places en une fois : refusée par la
+  validation côté serveur dans `createReservation`.
 - Soumission avec le champ honeypot rempli (simulant un bot) : refusée.
 - Annulation via un lien valide : statut mis à jour, jauge décrémentée, email
   de notification reçu par le comité.
