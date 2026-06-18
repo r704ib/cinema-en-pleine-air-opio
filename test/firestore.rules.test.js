@@ -116,8 +116,9 @@ test("a reservation that would push the gauge over 150 is rejected", async () =>
 
 test("cancelling an active reservation and decrementing the gauge succeeds", async () => {
   await testEnv.withSecurityRulesDisabled(async (context) => {
-    await setDoc(doc(context.firestore(), "reservations/r5"), validReservation());
-    await setDoc(doc(context.firestore(), "meta/gauge"), { reserved: 3, updatedAt: new Date() });
+    const db = context.firestore();
+    await setDoc(doc(db, "reservations/r5"), validReservation());
+    await setDoc(doc(db, "meta/gauge"), { reserved: 3, updatedAt: new Date() });
   });
   const visitor = testEnv.unauthenticatedContext().firestore();
   await assertSucceeds(
