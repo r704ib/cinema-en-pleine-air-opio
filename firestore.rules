@@ -1,8 +1,63 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
+
+    match /reservations/{reservationId} {
+      allow get: if true;
+      allow list: if false;
+      allow delete: if false;
+
+      allow create: if isValidNewReservation(request.resource.data);
+
+      allow update: if isValidCancellation(resource.data, request.resource.data);
+    }
+
+    match /meta/gauge {
+      allow get: if true;
+      allow list: if false;
+      allow create: if false;
+      allow delete: if false;
+
+      allow update: if isBoundedGaugeChange();
+    }
+
+    function isValidNewReservation(data) {
+      return data.status == 'active'
+        && data.hp is string && data.hp == ''
+        && data.prenom is string && data.prenom.size() > 0 && data.prenom.size() <= 100
+        && data.nom is string && data.nom.size() > 0 && data.nom.size() <= 100
+        && data.email is string && data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')
+        && data.telephone is string && data.telephone.size() > 0 && data.telephone.size() <= 30
+        && data.nb_adultes is int && data.nb_adultes >= 0 && data.nb_adultes <= 10
+        && data.nb_enfants_3_10 is int && data.nb_enfants_3_10 >= 0 && data.nb_enfants_3_10 <= 10
+        && data.nb_enfants_moins_3 is int && data.nb_enfants_moins_3 >= 0 && data.nb_enfants_moins_3 <= 10
+        && data.totalPlaces == data.nb_adultes + data.nb_enfants_3_10 + data.nb_enfants_moins_3
+        && data.totalPlaces >= 1 && data.totalPlaces <= 10
+        && data.montantEstime == data.nb_adultes * 5 + data.nb_enfants_3_10 * 3
+        && data.cancelledAt == null;
+    }
+
+    function isValidCancellation(before, after) {
+      return before.status == 'active'
+        && after.status == 'cancelled'
+        && after.cancelledAt != null
+        && after.totalPlaces == before.totalPlaces
+        && after.nb_adultes == before.nb_adultes
+        && after.nb_enfants_3_10 == before.nb_enfants_3_10
+        && after.nb_enfants_moins_3 == before.nb_enfants_moins_3
+        && after.montantEstime == before.montantEstime
+        && after.prenom == before.prenom
+        && after.nom == before.nom
+        && after.email == before.email
+        && after.telephone == before.telephone;
+    }
+
+    function isBoundedGaugeChange() {
+      let delta = request.resource.data.reserved - resource.data.reserved;
+      return request.resource.data.reserved >= 0
+        && request.resource.data.reserved <= 150
+        && delta >= -10 && delta <= 10 && delta != 0;
     }
   }
 }
