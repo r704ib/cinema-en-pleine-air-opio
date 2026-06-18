@@ -1,0 +1,8 @@
+# Configuration Netlify — déploiement automatique depuis GitHub.
+# Le site est statique (HTML/CSS/JS, aucune étape de build).
+# Seul le dossier "public/" est publié : les fichiers Firebase (functions/,
+# firebase.json, firestore.rules), les specs (docs/) et les tests restent
+# dans le dépôt mais ne sont PAS servis publiquement.
+[build]
+  publish = "public"
+  command = ""
