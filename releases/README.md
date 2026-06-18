@@ -11,6 +11,7 @@ interne) — seul le contenu de `public/` est servi aux visiteurs.
 
 ## Versions
 
+- [v4](v4.md) — 2026-06-19 — Retrait des mentions de « transat ».
 - [v3](v3.md) — 2026-06-18 — Mise à jour de l'adresse du lieu (« Cœur du village à Opio 06650 »).
 - [v2](v2.md) — 2026-06-18 — Affiche du film en fond (estompée) dans la section « Le film ».
 - [v1](v1.md) — 2026-06-18 — Migration Firebase : jauge partagée en temps réel, réservation et annulation en ligne.
