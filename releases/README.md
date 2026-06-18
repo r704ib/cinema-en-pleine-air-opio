@@ -11,6 +11,7 @@ interne) — seul le contenu de `public/` est servi aux visiteurs.
 
 ## Versions
 
+- [v6](v6.md) — 2026-06-19 — Heure de projection : début 21h30, fin ~23h15.
 - [v5](v5.md) — 2026-06-19 — Réponses FAQ (buvette, chaises fournies) et mise en cohérence.
 - [v4](v4.md) — 2026-06-19 — Retrait des mentions de « transat ».
 - [v3](v3.md) — 2026-06-18 — Mise à jour de l'adresse du lieu (« Cœur du village à Opio 06650 »).
