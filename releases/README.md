@@ -11,4 +11,5 @@ interne) — seul le contenu de `public/` est servi aux visiteurs.
 
 ## Versions
 
+- [v2](v2.md) — 2026-06-18 — Affiche du film en fond (estompée) dans la section « Le film ».
 - [v1](v1.md) — 2026-06-18 — Migration Firebase : jauge partagée en temps réel, réservation et annulation en ligne.
