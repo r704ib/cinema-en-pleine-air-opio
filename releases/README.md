@@ -11,6 +11,7 @@ interne) — seul le contenu de `public/` est servi aux visiteurs.
 
 ## Versions
 
+- [v7](v7.md) — 2026-06-19 — Ouverture des portes 20h30, « Mardi 28 juillet », parking (Carrefour et Salle polyvalente).
 - [v6](v6.md) — 2026-06-19 — Heure de projection : début 21h30, fin ~23h15.
 - [v5](v5.md) — 2026-06-19 — Réponses FAQ (buvette, chaises fournies) et mise en cohérence.
 - [v4](v4.md) — 2026-06-19 — Retrait des mentions de « transat ».
