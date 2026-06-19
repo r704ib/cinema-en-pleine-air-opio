@@ -817,6 +817,52 @@ footer{
   transition:top 0.25s var(--ease);
 }
 .skip-link:focus{top:16px;}
+
+/* --- Bandeau cookies --- */
+.cookie-banner{
+  position:fixed;
+  left:50%;
+  bottom:20px;
+  transform:translateX(-50%) translateY(160%);
+  z-index:1000;
+  width:min(640px,calc(100% - 32px));
+  background:rgba(36,26,56,0.94);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--c-border);
+  border-radius:var(--radius);
+  box-shadow:0 18px 50px rgba(0,0,0,0.45);
+  padding:20px 22px;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:14px 18px;
+  opacity:0;
+  transition:transform .5s var(--ease),opacity .5s var(--ease);
+}
+.cookie-banner.is-visible{transform:translateX(-50%) translateY(0);opacity:1;}
+.cookie-banner__text{flex:1 1 260px;font-size:13.5px;color:var(--c-muted);line-height:1.5;}
+.cookie-banner__text strong{color:var(--c-ivory);font-weight:600;}
+.cookie-banner__actions{display:flex;gap:10px;flex:0 0 auto;}
+.cookie-btn{
+  font-family:var(--font-body);
+  font-size:14px;
+  font-weight:600;
+  border-radius:999px;
+  padding:10px 22px;
+  cursor:pointer;
+  border:1px solid var(--c-border);
+  transition:filter .2s var(--ease),background .2s var(--ease);
+}
+.cookie-btn--refuse{background:transparent;color:var(--c-ivory);}
+.cookie-btn--refuse:hover{background:rgba(246,241,231,0.08);}
+.cookie-btn--accept{background:var(--c-gold);color:#231A12;border-color:var(--c-gold);}
+.cookie-btn--accept:hover{filter:brightness(1.08);}
+@media (max-width:520px){
+  .cookie-banner{bottom:0;border-radius:var(--radius) var(--radius) 0 0;width:100%;}
+  .cookie-banner__actions{width:100%;}
+  .cookie-btn{flex:1;}
+}
 </style>
 </head>
 <body>
@@ -1230,12 +1276,23 @@ footer{
 
     <div class="footer-bottom">
       <span>© 2026 Comité des fêtes d'Opio — Tous droits réservés</span>
-      <span>Site sans cookies ni traceurs · Conçu et réalisé par Oria</span>
+      <span>Mesure d'audience avec votre consentement · Conçu et réalisé par Oria</span>
     </div>
   </div>
 </footer>
 
 </main>
+
+<div class="cookie-banner" id="cookie-banner" role="dialog" aria-live="polite" aria-label="Préférences de cookies">
+  <p class="cookie-banner__text">
+    <strong>Cookies de mesure d'audience.</strong>
+    Nous utilisons un outil de statistiques (Google Analytics) pour comprendre la fréquentation du site. Aucune donnée n'est utilisée à des fins publicitaires.
+  </p>
+  <div class="cookie-banner__actions">
+    <button type="button" class="cookie-btn cookie-btn--refuse" id="cookie-refuse">Refuser</button>
+    <button type="button" class="cookie-btn cookie-btn--accept" id="cookie-accept">Accepter</button>
+  </div>
+</div>
 
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 <script>
@@ -1416,13 +1473,43 @@ footer{
     projectId: "cinema-en-pleine-air-opi-ac81e",
     storageBucket: "cinema-en-pleine-air-opi-ac81e.firebasestorage.app",
     messagingSenderId: "245777069404",
-    appId: "1:245777069404:web:8478506b55ec08fb8abd99"
+    appId: "1:245777069404:web:8478506b55ec08fb8abd99",
+    measurementId: "G-R66JNXKKPZ"
   };
 
   var app = initializeApp(firebaseConfig);
   var db = getFirestore(app);
   var functions = getFunctions(app);
   var createReservation = httpsCallable(functions, 'createReservation');
+
+  // --- Consentement cookies + statistiques (Google Analytics) ---
+  (function () {
+    var KEY = 'cookie-consent-opio';
+    var banner = document.getElementById('cookie-banner');
+    function loadAnalytics() {
+      import("https://www.gstatic.com/firebasejs/10.13.0/firebase-analytics.js")
+        .then(function (m) { m.getAnalytics(app); })
+        .catch(function () {});
+    }
+    var choice = null;
+    try { choice = localStorage.getItem(KEY); } catch (e) {}
+    if (choice === 'accepted') {
+      loadAnalytics();
+    } else if (choice !== 'refused' && banner) {
+      requestAnimationFrame(function () { banner.classList.add('is-visible'); });
+      var accept = document.getElementById('cookie-accept');
+      var refuse = document.getElementById('cookie-refuse');
+      if (accept) accept.addEventListener('click', function () {
+        try { localStorage.setItem(KEY, 'accepted'); } catch (e) {}
+        banner.classList.remove('is-visible');
+        loadAnalytics();
+      });
+      if (refuse) refuse.addEventListener('click', function () {
+        try { localStorage.setItem(KEY, 'refused'); } catch (e) {}
+        banner.classList.remove('is-visible');
+      });
+    }
+  })();
 
   var MAX_PLACES = 150;
   var MAX_PER_RESERVATION = 10;
