@@ -76,7 +76,9 @@ function selectFeedbackRecipients(params) {
 
   if (!feedbackEnabled) return [];
   if (typeof sessionDate !== "number" || typeof now !== "number") return [];
-  if (now < sessionDate + ONE_DAY_MS) return [];
+  const nowDay = new Date(now); nowDay.setHours(0, 0, 0, 0);
+  const sessionDay = new Date(sessionDate); sessionDay.setHours(0, 0, 0, 0);
+  if (nowDay.getTime() <= sessionDay.getTime()) return [];
 
   const firstRequests = [];
   const reminders = [];

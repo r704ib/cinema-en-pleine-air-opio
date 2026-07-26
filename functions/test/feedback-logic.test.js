@@ -76,7 +76,7 @@ function baseParams(overrides) {
     {
       reservations: [],
       avisReservationIds: new Set(),
-      now: new Date(2026, 6, 30, 9, 0, 0), // J+2 à 9h (24h after session)
+      now: new Date(2026, 6, 29, 9, 0, 0), // J+1 à 9h (le lendemain matin)
       sessionDate: session,
       feedbackEnabled: true,
     },
