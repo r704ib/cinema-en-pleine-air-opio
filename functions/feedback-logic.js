@@ -49,6 +49,57 @@ function validateFeedbackInput(data) {
   };
 }
 
+function matchReservationByEmail(reservations, email) {
+  const target = normalizeEmail(email);
+  if (!target) return null;
+  for (let i = 0; i < reservations.length; i++) {
+    if (normalizeEmail(reservations[i].email) === target) return reservations[i];
+  }
+  return null;
+}
+
+function toMillis(value) {
+  if (value instanceof Date) return value.getTime();
+  if (typeof value === "number") return value;
+  if (value && typeof value.toDate === "function") return value.toDate().getTime();
+  return null;
+}
+
+function selectFeedbackRecipients(params) {
+  const reservations = params.reservations || [];
+  const avisReservationIds = params.avisReservationIds || new Set();
+  const now = toMillis(params.now);
+  const sessionDate = toMillis(params.sessionDate);
+  const feedbackEnabled = params.feedbackEnabled === true;
+  const maxPerDay = params.maxPerDay || MAX_FEEDBACK_EMAILS_PER_DAY;
+  const reminderDelayMs = (params.reminderDelayDays || FEEDBACK_REMINDER_DELAY_DAYS) * ONE_DAY_MS;
+
+  if (!feedbackEnabled) return [];
+  if (typeof sessionDate !== "number" || typeof now !== "number") return [];
+  if (now < sessionDate + ONE_DAY_MS) return [];
+
+  const firstRequests = [];
+  const reminders = [];
+
+  for (let i = 0; i < reservations.length; i++) {
+    const r = reservations[i];
+    if (r.status !== "active") continue;
+    if (r.avisOptOut === true) continue;
+    if (avisReservationIds.has(r.id)) continue;
+
+    if (r.avisRequestSent !== true) {
+      firstRequests.push({ reservationId: r.id, type: "request", email: r.email, prenom: r.prenom });
+    } else if (r.avisRelanceSent !== true) {
+      const sentAt = toMillis(r.avisRequestSentAt);
+      if (typeof sentAt === "number" && now - sentAt >= reminderDelayMs) {
+        reminders.push({ reservationId: r.id, type: "reminder", email: r.email, prenom: r.prenom });
+      }
+    }
+  }
+
+  return firstRequests.concat(reminders).slice(0, maxPerDay);
+}
+
 module.exports = {
   MAX_FEEDBACK_EMAILS_PER_DAY: MAX_FEEDBACK_EMAILS_PER_DAY,
   FEEDBACK_REMINDER_DELAY_DAYS: FEEDBACK_REMINDER_DELAY_DAYS,
@@ -56,4 +107,6 @@ module.exports = {
   ONE_DAY_MS: ONE_DAY_MS,
   normalizeEmail: normalizeEmail,
   validateFeedbackInput: validateFeedbackInput,
+  matchReservationByEmail: matchReservationByEmail,
+  selectFeedbackRecipients: selectFeedbackRecipients,
 };

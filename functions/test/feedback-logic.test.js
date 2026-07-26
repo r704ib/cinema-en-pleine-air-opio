@@ -58,3 +58,93 @@ test("a comment longer than the max is rejected", () => {
   expect(r.valid).toBe(false);
   expect(r.errors).toContain("commentaire");
 });
+
+const { matchReservationByEmail, selectFeedbackRecipients } = require("../feedback-logic");
+
+test("matchReservationByEmail matches regardless of case/spaces", () => {
+  const reservations = [
+    { id: "1", email: "Alice@Example.FR" },
+    { id: "2", email: "bob@example.fr" },
+  ];
+  expect(matchReservationByEmail(reservations, " alice@example.fr ").id).toBe("1");
+  expect(matchReservationByEmail(reservations, "nobody@x.fr")).toBeNull();
+});
+
+function baseParams(overrides) {
+  const session = new Date(2026, 6, 28, 20, 30, 0); // 28/07/2026 20h30
+  return Object.assign(
+    {
+      reservations: [],
+      avisReservationIds: new Set(),
+      now: new Date(2026, 6, 30, 9, 0, 0), // J+2 à 9h (24h after session)
+      sessionDate: session,
+      feedbackEnabled: true,
+    },
+    overrides || {}
+  );
+}
+
+test("returns nothing when feedback is disabled", () => {
+  const out = selectFeedbackRecipients(baseParams({ feedbackEnabled: false,
+    reservations: [{ id: "1", status: "active", email: "a@b.fr", prenom: "A" }] }));
+  expect(out).toEqual([]);
+});
+
+test("returns nothing before session day + 1", () => {
+  const out = selectFeedbackRecipients(baseParams({
+    now: new Date(2026, 6, 28, 23, 0, 0), // même soir, trop tôt
+    reservations: [{ id: "1", status: "active", email: "a@b.fr", prenom: "A" }],
+  }));
+  expect(out).toEqual([]);
+});
+
+test("first requests: only active, not opted-out, not already asked, no existing avis", () => {
+  const out = selectFeedbackRecipients(baseParams({
+    reservations: [
+      { id: "1", status: "active", email: "a@b.fr", prenom: "A" },
+      { id: "2", status: "cancelled", email: "c@b.fr", prenom: "C" },
+      { id: "3", status: "active", email: "d@b.fr", prenom: "D", avisOptOut: true },
+      { id: "4", status: "active", email: "e@b.fr", prenom: "E", avisRequestSent: true, avisRequestSentAt: new Date(2026, 6, 29, 8, 0, 0) },
+    ],
+    avisReservationIds: new Set(["1"]), // déjà un avis pour 1
+  }));
+  // seuls restent : aucun (1 a un avis, 2 annulé, 3 opt-out, 4 déjà sollicité récemment)
+  expect(out.map((r) => r.reservationId)).toEqual([]);
+});
+
+test("first request produced for a fresh active reservation", () => {
+  const out = selectFeedbackRecipients(baseParams({
+    reservations: [{ id: "9", status: "active", email: "z@b.fr", prenom: "Zoe" }],
+  }));
+  expect(out).toEqual([{ reservationId: "9", type: "request", email: "z@b.fr", prenom: "Zoe" }]);
+});
+
+test("reminder after 3 days for someone asked but without avis", () => {
+  const out = selectFeedbackRecipients(baseParams({
+    now: new Date(2026, 7, 1, 9, 0, 0), // 3 jours après avisRequestSentAt
+    reservations: [{
+      id: "7", status: "active", email: "g@b.fr", prenom: "G",
+      avisRequestSent: true, avisRequestSentAt: new Date(2026, 6, 29, 9, 0, 0),
+    }],
+  }));
+  expect(out).toEqual([{ reservationId: "7", type: "reminder", email: "g@b.fr", prenom: "G" }]);
+});
+
+test("no reminder if avisRelanceSent already true", () => {
+  const out = selectFeedbackRecipients(baseParams({
+    now: new Date(2026, 7, 1, 9, 0, 0),
+    reservations: [{
+      id: "7", status: "active", email: "g@b.fr", prenom: "G",
+      avisRequestSent: true, avisRequestSentAt: new Date(2026, 6, 29, 9, 0, 0), avisRelanceSent: true,
+    }],
+  }));
+  expect(out).toEqual([]);
+});
+
+test("caps the total at maxPerDay, first requests prioritized", () => {
+  const reservations = [];
+  for (let i = 0; i < 60; i++) reservations.push({ id: "r" + i, status: "active", email: i + "@b.fr", prenom: "P" + i });
+  const out = selectFeedbackRecipients(baseParams({ reservations: reservations, maxPerDay: 50 }));
+  expect(out.length).toBe(50);
+  expect(out.every((r) => r.type === "request")).toBe(true);
+});
