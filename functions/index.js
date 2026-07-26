@@ -8,9 +8,16 @@ const admin = require("firebase-admin");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { validateReservationInput, MAX_PLACES } = require("./reservation-logic");
 const {
+  validateFeedbackInput,
+  matchReservationByEmail,
+  normalizeEmail,
+} = require("./feedback-logic");
+const {
   buildVisitorConfirmationEmail,
   buildOriaNewReservationEmail,
   buildOriaCancellationEmail,
+  buildFeedbackRequestEmail,
+  buildFeedbackReminderEmail,
 } = require("./email-content");
 
 admin.initializeApp();
@@ -105,6 +112,82 @@ exports.cancelReservation = onCall(async (request) => {
   });
 
   logger.info("Reservation cancelled", { reservationId: reservationId });
+  return { success: true };
+});
+
+exports.submitFeedback = onCall(async (request) => {
+  const result = validateFeedbackInput(request.data);
+  if (!result.valid) {
+    throw new HttpsError("invalid-argument", "Avis invalide: " + result.errors.join(", "));
+  }
+  const fb = result.feedback;
+
+  let reservationId = null;
+  let email = null;
+  let prenom = "";
+  let nom = "";
+
+  if (fb.mode === "email") {
+    const resSnap = await db.collection("reservations").doc(fb.reservationId).get();
+    if (!resSnap.exists) {
+      throw new HttpsError("not-found", "RESERVATION_NOT_FOUND");
+    }
+    const existing = await db.collection("avis")
+      .where("reservationId", "==", fb.reservationId).limit(1).get();
+    if (!existing.empty) {
+      throw new HttpsError("failed-precondition", "ALREADY_SUBMITTED");
+    }
+    const r = resSnap.data();
+    reservationId = fb.reservationId;
+    email = normalizeEmail(r.email);
+    prenom = r.prenom;
+    nom = r.nom;
+  } else {
+    // Mode QR : identification par email
+    const existingByEmail = await db.collection("avis")
+      .where("email", "==", fb.email).limit(1).get();
+    if (!existingByEmail.empty) {
+      throw new HttpsError("failed-precondition", "ALREADY_SUBMITTED");
+    }
+    const allRes = await db.collection("reservations").get();
+    const reservations = allRes.docs.map(function (d) {
+      return Object.assign({ id: d.id }, d.data());
+    });
+    const match = matchReservationByEmail(reservations, fb.email);
+    email = fb.email;
+    if (match) {
+      reservationId = match.id;
+      prenom = match.prenom;
+      nom = match.nom;
+    }
+  }
+
+  await db.collection("avis").add({
+    source: fb.mode,
+    reservationId: reservationId,
+    email: email,
+    prenom: prenom,
+    nom: nom,
+    note: fb.note,
+    commentaire: fb.commentaire,
+    film_souhaite: fb.film_souhaite,
+    publication_autorisee: fb.publication_autorisee,
+    createdAt: FieldValue.serverTimestamp(),
+  });
+
+  logger.info("Feedback submitted", { mode: fb.mode, reservationId: reservationId });
+  return { success: true };
+});
+
+exports.stopFeedback = onCall(async (request) => {
+  const reservationId = request.data && request.data.reservationId;
+  if (typeof reservationId !== "string" || reservationId.length === 0) {
+    throw new HttpsError("invalid-argument", "reservationId manquant");
+  }
+  await db.collection("reservations").doc(reservationId).set(
+    { avisOptOut: true }, { merge: true }
+  );
+  logger.info("Feedback opt-out", { reservationId: reservationId });
   return { success: true };
 });
 
