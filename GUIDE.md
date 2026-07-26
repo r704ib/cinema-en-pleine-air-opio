@@ -177,6 +177,32 @@ organisés directement par Oria, sans commune cliente.
 
 ---
 
+## 💬 Recueillir les avis après une séance
+
+Un système d'avis est en place pour recueillir les retours des participants.
+
+**Deux façons pour les gens de donner leur avis :**
+- **Par email** : un lien personnel leur est envoyé (ils sont reconnus
+  automatiquement).
+- **Par QR code sur place** : ils scannent l'affichette et saisissent leur
+  email ; le système retrouve leur nom. L'image du QR se génère avec
+  `outils-export/genere-qr.js` (fichier `qr-avis-opio.png` à imprimer).
+
+**Voir les avis :** lance `node export-avis.js` dans `outils-export/` → un
+fichier Excel `avis-….xlsx` est créé (note moyenne incluse).
+
+**⚠️ État actuel (Opio) :** l'**envoi automatique des emails d'avis est
+DÉSACTIVÉ** (`meta/session.feedbackEnabled = false`) — rien ne part tout seul.
+Le QR code, lui, reste utilisable sur place indépendamment.
+
+**Activer l'envoi automatique pour une prochaine séance :** mettre la date de la
+séance dans `meta/session.sessionDate` et passer `feedbackEnabled` à `true`
+(demande-moi, ou via la console Firebase). Le lendemain matin à 9h, les demandes
+d'avis partiront automatiquement (par lots de 50/jour), avec une relance unique
+3 jours après.
+
+---
+
 ## 🔗 Liens et comptes utiles
 
 | Quoi | Lien | Compte |
