@@ -11,6 +11,7 @@ interne) — seul le contenu de `public/` est servi aux visiteurs.
 
 ## Versions
 
+- [v11](v11.md) — 2026-07-26 — Renommage interne des notifications "comité" → "Oria" (aucun changement visible).
 - [v10](v10.md) — 2026-07-26 — Adresses email dédiées (contact@ et reservations@opio.oria-events.fr), domaine authentifié dans Brevo.
 - [v9](v9.md) — 2026-07-26 — Migration vers Firebase Hosting + nouveau domaine oria-events.fr, redirection de l'ancien lien Netlify.
 - [v8](v8.md) — 2026-06-19 — Statistiques de fréquentation (Google Analytics) avec bandeau de consentement cookies.
