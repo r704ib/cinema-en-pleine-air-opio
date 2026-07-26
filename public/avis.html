@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Votre avis — Cinéma en plein air d'Opio</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --c-bg:#15101F; --c-surface:#241A38; --c-gold:#E8A33D;
+    --c-gold-soft:rgba(232,163,61,0.16); --c-ivory:#F6F1E7;
+    --c-muted:#B8AFC9; --c-border:rgba(246,241,231,0.1);
+    --font-display:'Fraunces',serif; --font-body:'Outfit',sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  body{margin:0;background:var(--c-bg);color:var(--c-ivory);
+    font-family:var(--font-body);line-height:1.6;
+    -webkit-font-smoothing:antialiased;padding:0 20px;}
+  .wrap{max-width:560px;margin:56px auto;}
+  h1{font-family:var(--font-display);font-weight:600;font-size:1.7rem;line-height:1.15;margin:0 0 8px;}
+  .lead{color:var(--c-muted);margin-bottom:28px;}
+  .card{background:rgba(36,26,56,0.6);border:1px solid var(--c-border);
+    border-radius:20px;padding:32px;backdrop-filter:blur(14px);}
+  label{display:block;font-size:0.85rem;font-weight:500;margin-bottom:8px;color:var(--c-muted);}
+  input[type=email],textarea{width:100%;padding:14px 16px;border-radius:12px;
+    border:1px solid var(--c-border);background:rgba(21,16,31,0.6);color:var(--c-ivory);
+    font-family:var(--font-body);font-size:1rem;resize:vertical;}
+  input[type=email]:focus,textarea:focus{outline:none;border-color:var(--c-gold);
+    box-shadow:0 0 0 3px var(--c-gold-soft);}
+  .field{margin-bottom:20px;}
+  .stars{display:flex;gap:8px;margin-bottom:4px;}
+  .star{font-size:2rem;line-height:1;background:none;border:none;cursor:pointer;
+    color:rgba(246,241,231,0.28);transition:color .15s ease,transform .1s ease;padding:0;}
+  .star:hover,.star.active{color:var(--c-gold);}
+  .star:active{transform:scale(0.9);}
+  .consent{display:flex;gap:10px;align-items:flex-start;font-size:0.9rem;color:var(--c-muted);margin-bottom:24px;}
+  .consent input{margin-top:3px;}
+  button.submit{width:100%;background:var(--c-gold);color:#231A12;border:none;
+    border-radius:999px;padding:15px 24px;font-family:var(--font-body);font-size:1rem;
+    font-weight:600;cursor:pointer;transition:filter .2s ease;}
+  button.submit:hover{filter:brightness(1.07);}
+  button.submit:disabled{opacity:0.5;cursor:not-allowed;}
+  a{color:var(--c-gold);}
+  .state{display:none;}
+  .home{margin-top:24px;font-size:0.9rem;}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Votre avis compte</h1>
+    <p class="lead" id="lead">Merci d'avoir participé au Cinéma en plein air d'Opio !</p>
+
+    <div class="card state" id="loading-state" style="display:block">Chargement…</div>
+
+    <div class="card state" id="form-state">
+      <div class="field" id="email-field" style="display:none">
+        <label for="email">Votre email</label>
+        <input type="email" id="email" autocomplete="email" placeholder="vous@exemple.fr">
+      </div>
+
+      <div class="field">
+        <label>Votre note sur la séance</label>
+        <div class="stars" id="stars" role="radiogroup" aria-label="Note de 1 à 5 étoiles">
+          <button type="button" class="star" data-value="1" aria-label="1 étoile">★</button>
+          <button type="button" class="star" data-value="2" aria-label="2 étoiles">★</button>
+          <button type="button" class="star" data-value="3" aria-label="3 étoiles">★</button>
+          <button type="button" class="star" data-value="4" aria-label="4 étoiles">★</button>
+          <button type="button" class="star" data-value="5" aria-label="5 étoiles">★</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="commentaire">Un commentaire ? (facultatif)</label>
+        <textarea id="commentaire" rows="3" placeholder="Ce que vous avez aimé, ce qu'on pourrait améliorer…"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="film">Quel film aimeriez-vous voir la prochaine fois ? (facultatif)</label>
+        <textarea id="film" rows="2" placeholder="Un titre, un genre…"></textarea>
+      </div>
+
+      <label class="consent">
+        <input type="checkbox" id="consent">
+        <span>J'autorise le Cinéma en plein air d'Opio à publier mon avis (avec mon prénom) sur son site.</span>
+      </label>
+
+      <button type="button" class="submit" id="submit-btn">Envoyer mon avis</button>
+    </div>
+
+    <div class="card state" id="success-state">
+      <p>Merci beaucoup pour votre retour&nbsp;! 🌟 Il nous aide à rendre les prochaines séances encore meilleures.</p>
+    </div>
+
+    <div class="card state" id="already-state">
+      <p>Vous avez déjà donné votre avis pour cette séance — merci&nbsp;!</p>
+    </div>
+
+    <div class="card state" id="stop-state">
+      <p>C'est noté : vous ne recevrez plus de demande d'avis. Merci&nbsp;!</p>
+    </div>
+
+    <div class="card state" id="error-state">
+      <p>Une erreur est survenue, ou ce lien n'est pas valide. Réessayez plus tard.</p>
+    </div>
+
+    <p class="home"><a href="/">← Retour au site du Cinéma en plein air d'Opio</a></p>
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+  import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-functions.js";
+
+  var firebaseConfig = {
+    apiKey: "AIzaSyBB-WiFkZfrHQD9rXDQ6KjbeNQyMlO4VbA",
+    authDomain: "cinema-en-pleine-air-opi-ac81e.firebaseapp.com",
+    projectId: "cinema-en-pleine-air-opi-ac81e",
+    storageBucket: "cinema-en-pleine-air-opi-ac81e.firebasestorage.app",
+    messagingSenderId: "245777069404",
+    appId: "1:245777069404:web:8478506b55ec08fb8abd99"
+  };
+  var app = initializeApp(firebaseConfig);
+  var db = getFirestore(app);
+  var functions = getFunctions(app);
+  var submitFeedback = httpsCallable(functions, 'submitFeedback');
+  var stopFeedback = httpsCallable(functions, 'stopFeedback');
+
+  var params = new URLSearchParams(window.location.search);
+  var reservationId = params.get('id');
+  var source = params.get('source');
+  var stop = params.get('stop');
+
+  var el = function (id) { return document.getElementById(id); };
+  function show(id) {
+    ['loading-state','form-state','success-state','already-state','stop-state','error-state']
+      .forEach(function (s) { el(s).style.display = (s === id) ? 'block' : 'none'; });
+  }
+
+  var note = 0;
+  function setStars(v) {
+    note = v;
+    var stars = document.querySelectorAll('.star');
+    stars.forEach(function (s) {
+      s.classList.toggle('active', Number(s.dataset.value) <= v);
+    });
+  }
+  document.querySelectorAll('.star').forEach(function (s) {
+    s.addEventListener('click', function () { setStars(Number(s.dataset.value)); });
+  });
+
+  var mode = null; // "email" | "qr"
+
+  async function init() {
+    if (reservationId && stop === '1') {
+      try { await stopFeedback({ reservationId: reservationId }); show('stop-state'); }
+      catch (e) { show('error-state'); }
+      return;
+    }
+    if (reservationId) {
+      mode = 'email';
+      try {
+        var snap = await getDoc(doc(db, 'reservations', reservationId));
+        if (!snap.exists()) { show('error-state'); return; }
+        el('lead').textContent = 'Bonjour ' + snap.data().prenom + ', merci d\'avoir participé !';
+        el('email-field').style.display = 'none';
+        show('form-state');
+      } catch (e) { show('error-state'); }
+      return;
+    }
+    if (source === 'qr') {
+      mode = 'qr';
+      el('email-field').style.display = 'block';
+      show('form-state');
+      return;
+    }
+    show('error-state');
+  }
+
+  el('submit-btn').addEventListener('click', async function () {
+    if (note < 1) { alert('Merci de choisir une note (1 à 5 étoiles).'); return; }
+    var payload = {
+      mode: mode,
+      note: note,
+      commentaire: el('commentaire').value,
+      film_souhaite: el('film').value,
+      publication_autorisee: el('consent').checked,
+    };
+    if (mode === 'email') {
+      payload.reservationId = reservationId;
+    } else {
+      var email = el('email').value.trim();
+      if (!email) { alert('Merci d\'indiquer votre email.'); return; }
+      payload.email = email;
+    }
+    var btn = el('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Envoi…';
+    try {
+      await submitFeedback(payload);
+      show('success-state');
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Envoyer mon avis';
+      if (err && err.message && err.message.indexOf('ALREADY_SUBMITTED') !== -1) {
+        show('already-state');
+      } else {
+        alert('Impossible d\'envoyer votre avis, réessayez.');
+      }
+    }
+  });
+
+  init();
+</script>
+</body>
+</html>
