@@ -1,0 +1,13 @@
+{
+  "name": "outils-export-reservations",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Export des réservations Firestore vers Excel (.xlsx)",
+  "scripts": {
+    "export": "node export-reservations.js"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "firebase-admin": "^12.7.0"
+  }
+}

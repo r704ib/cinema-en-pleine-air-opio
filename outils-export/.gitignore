@@ -1,0 +1,4 @@
+# NE JAMAIS publier ces fichiers (secrets / données personnelles)
+cle-admin.json
+*.xlsx
+node_modules/
