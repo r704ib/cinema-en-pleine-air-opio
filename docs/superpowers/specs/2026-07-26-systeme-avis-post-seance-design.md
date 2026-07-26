@@ -25,9 +25,12 @@ plusieurs communes.
 | Échelle de note | Étoiles **1 à 5** |
 | Questions du formulaire | Note (⭐1-5) + commentaire libre + « Quel film aimeriez-vous voir ? » |
 | Anonymat | Avis **lié à la réservation** (prénom/nom connus, non affichés publiquement) |
+| Consentement de publication | Case à cocher opt-in « J'autorise la publication de mon avis (prénom) ». Publication future en **prénom + initiale** (« Marie D. »), uniquement pour les avis consentis |
+| Relance | **Une seule** relance automatique des non-répondants, **3 jours** après la 1ʳᵉ demande (configurable) ; lien de désinscription inclus |
+| Canal QR sur place | Page d'avis générique accessible par QR code ; l'utilisateur **saisit lui-même** son prénom (avis non lié à une réservation) |
 | Adresse expéditeur | `reservations@opio.oria-events.fr` (déjà authentifiée DKIM/DMARC) |
 | Activation | Construit et testé maintenant ; **envoi automatique inerte pour Opio**, armé pour les prochaines séances |
-| Limite d'envoi | **50 emails/jour** (configurable), étalement automatique sur plusieurs jours si dépassement |
+| Limite d'envoi | **50 emails/jour** (configurable), étalement automatique sur plusieurs jours ; relances incluses dans ce quota |
 | Heure d'envoi | **9h00**, fuseau `Europe/Paris` |
 
 ---
@@ -42,35 +45,45 @@ Cloud Functions** (Admin SDK, immunisé aux règles client).
 
 1. **Page `public/avis.html`** — page autonome (modèle `annuler.html`), mais
    habillée à la charte du site principal (variables CSS `--c-bg`, `--c-gold`,
-   polices Fraunces/Outfit, carte `.glass`, champs `.field`).
-   - URL : `https://cinema-en-pleine-air-opio.oria-events.fr/avis.html?id=<reservationId>`
-   - Lit la réservation (`getDoc`, autorisé par `allow get: if true`) pour
-     accueillir la personne par son prénom.
-   - Formulaire : sélecteur d'étoiles 1-5, `textarea` commentaire, `textarea`
-     film souhaité, bouton « Envoyer mon avis ».
+   polices Fraunces/Outfit, carte `.glass`, champs `.field`). **Deux modes :**
+   - **Mode email** : URL `…/avis.html?id=<reservationId>`. Lit la réservation
+     (`getDoc`, autorisé par `allow get: if true`) pour accueillir la personne
+     par son prénom ; le prénom/nom ne sont pas saisis (déjà connus).
+   - **Mode QR** : URL `…/avis.html?source=qr` (sans `id`). Affiche des champs
+     **prénom** (requis) et **nom** (optionnel) que l'utilisateur saisit.
+   - Formulaire commun : sélecteur d'étoiles 1-5 (requis), `textarea`
+     commentaire, `textarea` film souhaité, **case à cocher opt-in** « J'autorise
+     la publication de mon avis (prénom) sur le site », bouton « Envoyer mon
+     avis ».
    - Appelle la fonction `submitFeedback`.
-   - Gère les états : formulaire → merci ; déjà répondu → message ; lien
-     invalide → message d'erreur.
+   - Gère les états : formulaire → merci ; déjà répondu (mode email) → message ;
+     lien invalide → message d'erreur.
 
 2. **Collection Firestore `avis`** — un document par réponse :
    ```
    {
-     reservationId: string,      // lien vers la réservation
-     prenom: string,             // recopié pour lisibilité de l'export
-     nom: string,
-     note: number,               // entier 1..5
-     commentaire: string,        // peut être vide
-     film_souhaite: string,      // peut être vide
+     source: "email" | "qr",       // origine de l'avis
+     reservationId: string | null, // lien vers la réservation (null en mode QR)
+     prenom: string,               // pré-rempli (email) ou saisi (QR)
+     nom: string,                  // idem, peut être vide
+     note: number,                 // entier 1..5
+     commentaire: string,          // peut être vide
+     film_souhaite: string,        // peut être vide
+     publication_autorisee: boolean, // consentement de publication
      createdAt: timestamp
    }
    ```
 
 3. **Cloud Function `submitFeedback`** (callable) — valide et enregistre l'avis.
-   - Vérifie que `reservationId` existe et correspond à une réservation.
-   - Vérifie qu'aucun avis n'existe déjà pour ce `reservationId` (anti-doublon) ;
-     sinon `HttpsError("failed-precondition", "ALREADY_SUBMITTED")`.
+   - **Mode email** (`reservationId` fourni) : vérifie que la réservation existe ;
+     vérifie qu'aucun avis n'existe déjà pour ce `reservationId` (anti-doublon) ;
+     sinon `HttpsError("failed-precondition", "ALREADY_SUBMITTED")`. Recopie
+     prénom/nom depuis la réservation (ignore ceux envoyés par le client).
+   - **Mode QR** (`source === "qr"`, pas de `reservationId`) : exige un `prenom`
+     non vide ; pas d'anti-doublon possible (limitation acceptée).
    - Valide la note (entier 1..5) et borne la longueur des textes (ex. 2000
-     caractères) ; sinon `HttpsError("invalid-argument", ...)`.
+     caractères) ; normalise `publication_autorisee` en booléen ; sinon
+     `HttpsError("invalid-argument", ...)`.
    - Écrit le document dans `avis` avec `createdAt = serverTimestamp()`.
 
 4. **Cloud Function programmée `sendFeedbackRequests`** (`onSchedule`,
@@ -90,6 +103,14 @@ Cloud Functions** (Admin SDK, immunisé aux règles client).
      réalisant l'étalement automatique.
    - Idempotence : le marquage `avisRequestSent` garantit qu'une personne n'est
      jamais sollicitée deux fois, même si la fonction est relancée.
+   - **Relances** : lors du même réveil quotidien, la fonction sélectionne aussi
+     les réservations `active` où `avisRequestSent === true`, dont
+     `avisRequestSentAt` remonte à **≥ 3 jours** (`FEEDBACK_REMINDER_DELAY_DAYS`,
+     configurable), qui **n'ont pas d'avis enregistré** (aucun document `avis`
+     avec ce `reservationId`) et où `avisRelanceSent !== true`. Elle envoie **une
+     seule** relance (email de rappel avec lien d'avis + lien de désinscription),
+     puis met `avisRelanceSent = true` et `avisRelanceSentAt`. Les relances
+     comptent dans le quota quotidien (priorité aux 1ʳᵉˢ demandes, puis relances).
 
 5. **Document de configuration `meta/session`** :
    ```
@@ -101,14 +122,25 @@ Cloud Functions** (Admin SDK, immunisé aux règles client).
    - Pour Opio : `feedbackEnabled: false` (inerte). Le document peut être créé
      avec la date du 28/07/2026 et l'interrupteur à `false`.
 
-6. **Constructeur d'email `buildFeedbackRequestEmail`** (dans
-   `functions/email-content.js`) — email au visiteur contenant le lien
-   `SITE_URL + "/avis.html?id=" + reservationId`, ton chaleureux, cohérent avec
-   les autres emails.
+6. **Constructeurs d'emails** (dans `functions/email-content.js`) :
+   - `buildFeedbackRequestEmail` — 1ʳᵉ demande d'avis, lien
+     `SITE_URL + "/avis.html?id=" + reservationId`, ton chaleureux.
+   - `buildFeedbackReminderEmail` — relance (rappel), même lien + **lien de
+     désinscription** (`SITE_URL + "/avis.html?id=" + reservationId + "&stop=1"`
+     ou mécanisme équivalent) pour ne plus être sollicité.
 
 7. **Outil d'export** — `outils-export/export-avis.js` (ou extension de
-   l'existant) pour exporter la collection `avis` en `.xlsx` : note, commentaire,
-   film souhaité, prénom/nom, date.
+   l'existant) pour exporter la collection `avis` en `.xlsx` : source, note,
+   commentaire, film souhaité, prénom/nom, consentement de publication, date.
+
+8. **QR code** — génération d'une image (`outils-export/genere-qr.js` ou
+   équivalent) encodant l'URL `SITE_URL + "/avis.html?source=qr"`, fournie en
+   `.png` à imprimer/afficher sur place. (Un seul QR, valable pour toute séance.)
+
+9. **Désinscription** — un lien `&stop=1` (ou route dédiée) qui, via une
+   petite Cloud Function callable `stopFeedback`, marque la réservation
+   `avisOptOut = true` : elle ne recevra plus ni demande ni relance. Le
+   sélecteur d'envoi (composant 4) exclut les réservations `avisOptOut === true`.
 
 ### 3.2 Règles de sécurité Firestore (`firestore.rules`)
 
@@ -123,6 +155,11 @@ match /avis/{avisId} {
 }
 ```
 
+Pour permettre l'anti-doublon **côté page** (informer l'utilisateur avant envoi
+en mode email), la vérification d'existence d'un avis se fait dans la fonction
+`submitFeedback` (Admin SDK, immunisé aux règles) — le client ne lit jamais la
+collection `avis`.
+
 `meta/session` suit le modèle de `meta/gauge` : `allow get: if true;` (la page
 pourrait éventuellement lire la date), `list` et écritures `false`.
 
@@ -134,19 +171,25 @@ pourrait éventuellement lire la date), `list` et écritures `false`.
 Séance (soir J)
    │
    ▼  meta/session.feedbackEnabled == true  ET  aujourd'hui >= sessionDate + 1j
-sendFeedbackRequests (9h Paris, quotidien)
-   │  prend jusqu'à 50 réservations "avisRequestSent != true"
+sendFeedbackRequests (9h Paris, quotidien) — exclut avisOptOut == true
+   │  1ʳᵉ demande : jusqu'à 50 réservations "avisRequestSent != true"
+   │  relances    : sollicitées depuis >=3j, sans avis, avisRelanceSent != true
    ▼
-Brevo → email "donnez votre avis" (lien avis.html?id=…)  → marque avisRequestSent
+Brevo → email (demande OU relance, lien avis.html?id=…) → marque le repère
    │
    ▼
-Visiteur clique → avis.html lit la réservation (prénom) → remplit ⭐+texte
+Visiteur clique → avis.html (mode email : prénom pré-rempli) → remplit ⭐+texte+consentement
    │
    ▼
 submitFeedback (callable) → valide + anti-doublon → écrit dans "avis"
    │
    ▼
 Oria consulte / exporte "avis" en Excel
+
+
+Parcours QR (sur place) :
+QR affiché → avis.html?source=qr → l'utilisateur saisit prénom + ⭐+texte
+   → submitFeedback (source="qr", reservationId=null) → écrit dans "avis"
 ```
 
 ---
@@ -155,11 +198,14 @@ Oria consulte / exporte "avis" en Excel
 
 | Cas | Comportement |
 |---|---|
-| Lien `avis.html` sans `id` ou id inconnu | Message « lien invalide » (comme `annuler.html`) |
-| Avis déjà soumis pour cette réservation | Message « Vous avez déjà donné votre avis, merci ! » |
+| Lien `avis.html` sans `id` **et** sans `source=qr` | Message « lien invalide » (comme `annuler.html`) |
+| Avis déjà soumis pour cette réservation (mode email) | Message « Vous avez déjà donné votre avis, merci ! » |
+| Mode QR : prénom vide | Bouton bloqué côté page + rejet `invalid-argument` côté fonction |
+| Mode QR : soumissions multiples | Acceptées (pas d'anti-doublon fiable sans identité) — limitation connue |
 | Note absente / hors 1..5 | Bouton d'envoi bloqué côté page + rejet `invalid-argument` côté fonction |
-| Échec d'envoi Brevo (une réservation) | L'email en échec n'est **pas** marqué `avisRequestSent` (retenté au prochain réveil) ; les autres continuent (pas de blocage global) |
+| Échec d'envoi Brevo (une réservation) | L'email en échec n'est **pas** marqué envoyé (retenté au prochain réveil) ; les autres continuent (pas de blocage global) |
 | `meta/session` absent ou `feedbackEnabled=false` | La fonction programmée ne fait rien (état normal inerte) |
+| Personne désinscrite (`avisOptOut=true`) | Exclue des demandes et des relances |
 
 ---
 
@@ -167,31 +213,48 @@ Oria consulte / exporte "avis" en Excel
 
 - **Unitaires (Jest, côté functions) :**
   - Validation de l'avis : note valide/invalide, textes trop longs, champs
-    optionnels vides acceptés.
-  - `buildFeedbackRequestEmail` : destinataire = email visiteur, lien
-    `avis.html?id=…` présent.
-  - Logique de sélection : ne prend que les `active` + `avisRequestSent != true`,
-    respecte la limite de 50.
+    optionnels vides acceptés, `publication_autorisee` normalisé en booléen.
+  - Mode QR : prénom requis ; mode email : prénom/nom recopiés de la réservation.
+  - `buildFeedbackRequestEmail` / `buildFeedbackReminderEmail` : destinataire =
+    email visiteur, lien `avis.html?id=…` présent ; la relance contient le lien
+    de désinscription.
+  - Logique de sélection : 1ʳᵉ demande ne prend que `active` +
+    `avisRequestSent != true` + `avisOptOut != true`, respecte la limite de 50 ;
+    relance ne prend que sollicités depuis ≥3j, sans avis, `avisRelanceSent != true`.
 - **Manuel bout-en-bout :** créer une réservation de test → déclencher l'envoi
-  (via un chemin de test contrôlé) → ouvrir `avis.html` → soumettre → vérifier
-  le document dans `avis` + l'anti-doublon → export Excel.
+  (via un chemin de test contrôlé) → ouvrir `avis.html` (mode email) → soumettre
+  → vérifier le document dans `avis` + l'anti-doublon → tester le mode QR
+  (`?source=qr`) → vérifier la désinscription → export Excel.
 
 ---
 
-## 7. Hors périmètre (YAGNI)
+## 7. Conformité RGPD — publication des avis
 
-- Pas de relance automatique des non-répondants (idée notée pour plus tard).
+- Les avis sont collectés dans un cadre **privé** (email de suivi / QR). Leur
+  **republication publique** (site vitrine) n'est autorisée que pour les avis
+  dont `publication_autorisee === true` (consentement opt-in explicite).
+- Publication recommandée en **prénom + initiale du nom** (« Marie D. »).
+- Droit de retrait : une personne peut demander la suppression de son avis
+  publié ; l'avis reste modifiable/supprimable via l'outil admin.
+- *L'affichage effectif des avis sur le site vitrine `oria-events.fr` fera
+  l'objet d'un lot ultérieur ; ce lot-ci ne fait que collecter le consentement.*
+
+## 8. Hors périmètre (YAGNI)
+
 - Pas de tableau de bord statistique intégré (l'export Excel suffit au départ).
 - Pas de gestion multi-communes dans ce lot (le modèle `meta/session` unique
   suffit pour l'événement courant ; la généralisation multi-événements fera
   l'objet d'un projet distinct).
-- Pas de QR code sur place (idée notée pour plus tard).
+- Pas d'affichage public des avis dans ce lot (seulement la collecte + le
+  consentement) — voir §7.
+- Plus d'**une** relance : volontairement limité à une seule, pour protéger la
+  réputation d'expéditeur (risque de plaintes spam).
 - Envoi manuel pour Opio : non automatisé ; si souhaité, déclenché
   ponctuellement via l'outil admin, hors de ce lot.
 
 ---
 
-## 8. Impact & coûts
+## 9. Impact & coûts
 
 - **Stockage :** ~1 Ko/avis, négligeable vs 1 Go gratuit Firestore.
 - **Écritures :** ~50/jour max, vs 20 000 gratuites/jour.
