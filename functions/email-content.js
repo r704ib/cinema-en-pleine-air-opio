@@ -57,9 +57,42 @@ function buildOriaCancellationEmail(reservation) {
   };
 }
 
+function buildFeedbackRequestEmail(reservation, reservationId) {
+  const url = SITE_URL + "/avis.html?id=" + reservationId;
+  return {
+    to: reservation.email,
+    subject: "Votre avis sur le Cinéma en plein air d'Opio",
+    htmlContent:
+      "<p>Bonjour " + reservation.prenom + ",</p>" +
+      "<p>Merci d'être venu(e) à la séance ! Votre avis nous aiderait beaucoup à " +
+      "améliorer les prochaines projections.</p>" +
+      "<p>Cela ne prend qu'une minute : " +
+      "<a href=\"" + url + "\">donnez votre avis ici</a>.</p>" +
+      "<p>À très vite sous les étoiles d'Opio !</p>",
+  };
+}
+
+function buildFeedbackReminderEmail(reservation, reservationId) {
+  const url = SITE_URL + "/avis.html?id=" + reservationId;
+  const stopUrl = url + "&stop=1";
+  return {
+    to: reservation.email,
+    subject: "Petit rappel : votre avis sur le Cinéma en plein air d'Opio",
+    htmlContent:
+      "<p>Bonjour " + reservation.prenom + ",</p>" +
+      "<p>Vous n'avez pas encore donné votre avis sur la séance — votre retour " +
+      "compte beaucoup pour nous !</p>" +
+      "<p><a href=\"" + url + "\">Donner mon avis</a> (une minute suffit).</p>" +
+      "<p>Si vous ne souhaitez plus recevoir ces messages, " +
+      "<a href=\"" + stopUrl + "\">cliquez ici</a>.</p>",
+  };
+}
+
 module.exports = {
   buildCancelUrl,
   buildVisitorConfirmationEmail,
   buildOriaNewReservationEmail,
   buildOriaCancellationEmail,
+  buildFeedbackRequestEmail,
+  buildFeedbackReminderEmail,
 };
