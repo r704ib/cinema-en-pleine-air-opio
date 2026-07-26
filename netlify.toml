@@ -6,3 +6,12 @@
 [build]
   publish = "public"
   command = ""
+
+# Le site est désormais hébergé sur Firebase Hosting (nouveau domaine
+# cinema-en-pleine-air-opio.oria-events.fr). Ce site Netlify n'est conservé
+# que pour rediriger les anciens liens déjà diffusés vers la nouvelle adresse.
+[[redirects]]
+  from = "/*"
+  to = "https://cinema-en-pleine-air-opio.oria-events.fr/:splat"
+  status = 301
+  force = true

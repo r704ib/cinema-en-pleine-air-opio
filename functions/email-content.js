@@ -1,6 +1,6 @@
 "use strict";
 
-const SITE_URL = "https://cinema-en-pleine-air-opio.netlify.app";
+const SITE_URL = "https://cinema-en-pleine-air-opio.oria-events.fr";
 const COMITE_EMAIL = "Oria.ei@outlook.fr";
 
 function buildCancelUrl(reservationId) {

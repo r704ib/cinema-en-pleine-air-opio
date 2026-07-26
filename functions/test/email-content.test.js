@@ -19,7 +19,7 @@ const sampleReservation = {
 
 test("buildCancelUrl includes the reservation id", () => {
   const url = buildCancelUrl("abc123");
-  expect(url).toBe("https://cinema-en-pleine-air-opio.netlify.app/annuler.html?id=abc123");
+  expect(url).toBe("https://cinema-en-pleine-air-opio.oria-events.fr/annuler.html?id=abc123");
 });
 
 test("buildVisitorConfirmationEmail addresses the visitor and includes the cancel link", () => {

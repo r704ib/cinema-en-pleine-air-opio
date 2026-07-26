@@ -13,7 +13,7 @@ se met à jour **en direct** pour tout le monde, ils reçoivent un email de
 confirmation, et le comité reçoit un email à chaque réservation — le tout
 enregistré dans une base de données sécurisée.
 
-- **Adresse du site :** https://cinema-en-pleine-air-opio.netlify.app
+- **Adresse du site :** https://cinema-en-pleine-air-opio.oria-events.fr
 - **Événement :** projection « Un p'tit truc en plus » — **mardi 28 juillet 2026**
 - **Horaires :** portes à **20h30** · film à **21h30** · fin ~**23h15**
 - **Jauge :** 150 places maximum · max 10 places par réservation
@@ -29,10 +29,12 @@ Imagine le projet comme un petit commerce — chaque service a un rôle précis 
 | Service | À quoi il sert | Analogie |
 |---|---|---|
 | **GitHub** | Range le code du site et garde l'historique de chaque version. | Le **classeur d'archives** |
-| **Netlify** | Affiche le site sur internet, à l'adresse `.netlify.app`. | La **vitrine** du magasin |
-| **Firebase** (Google) | Stocke les réservations et fait respecter les règles (max 150 places, etc.). | L'**arrière-boutique** + l'employé qui vérifie chaque commande |
+| **Firebase Hosting** (Google) | Affiche le site sur internet. | La **vitrine** du magasin |
+| **Firebase** (Firestore + Functions) | Stocke les réservations et fait respecter les règles (max 150 places, etc.). | L'**arrière-boutique** + l'employé qui vérifie chaque commande |
+| **OVH** | Détient ton nom de domaine `oria-events.fr` et le relie à Firebase. | Le **panneau d'adresse** devant le magasin |
 | **Brevo** | Envoie les emails automatiques (confirmation, notification). | Le **facteur** |
 | **Google Analytics** | Compte le nombre de visiteurs du site. | Le **compteur de passages** à l'entrée |
+| **Netlify** | Ancienne adresse du site (`.netlify.app`), gardée uniquement pour rediriger automatiquement vers la nouvelle adresse. | Le **panneau « a déménagé »** sur l'ancienne vitrine |
 
 **Firebase est en deux parties :**
 
@@ -48,7 +50,7 @@ Imagine le projet comme un petit commerce — chaque service a un rôle précis 
 ## 🔄 Ce qui se passe quand quelqu'un réserve
 
 ```
-   Visiteur                Netlify           Firebase                Brevo
+   Visiteur             Firebase Hosting       Firebase                Brevo
   (téléphone)             (le site)      (Functions + base)        (emails)
       │                      │                  │                     │
       │  1. remplit le       │                  │                     │
@@ -149,10 +151,9 @@ lancement réel, repartir d'une jauge propre :
 ## ✏️ Modifier le site plus tard
 
 Tu n'as **rien de technique à gérer**. Pour tout changement (texte, date, image,
-design…), il suffit de **me le demander** : je modifie, et le site se met à jour
-tout seul en ligne (déploiement automatique via GitHub → Netlify). Une **note de
-version** est créée à chaque fois dans le dossier `releases/` pour garder une
-trace de ce qui a changé.
+design…), il suffit de **me le demander** : je modifie le code puis je le
+déploie sur Firebase Hosting. Une **note de version** est créée à chaque fois
+dans le dossier `releases/` pour garder une trace de ce qui a changé.
 
 ---
 
@@ -161,8 +162,9 @@ trace de ce qui a changé.
 Les emails partent au nom de **« Cinéma en plein air Opio »**. Selon les
 réglages de messagerie, certains destinataires peuvent voir une adresse
 technique (`…@brevosend.com`) plutôt que `oria.ei@outlook.fr`. C'est normal et
-sans gravité. Pour afficher une adresse 100 % personnalisée, il faudra acheter
-un **nom de domaine** (ex. `cinema-opio.fr`) — on pourra le faire plus tard.
+sans gravité. Maintenant que tu as ton propre nom de domaine (`oria-events.fr`),
+il sera possible de configurer une adresse d'expéditeur 100 % personnalisée
+(ex. `contact@oria-events.fr`) — c'est une étape à part, pas encore faite.
 
 ---
 
@@ -170,10 +172,11 @@ un **nom de domaine** (ex. `cinema-opio.fr`) — on pourra le faire plus tard.
 
 | Quoi | Lien | Compte |
 |---|---|---|
-| Le site en ligne | https://cinema-en-pleine-air-opio.netlify.app | — (public) |
+| Le site en ligne | https://cinema-en-pleine-air-opio.oria-events.fr | — (public) |
 | Base de données + statistiques | https://console.firebase.google.com | `oria.ei@outlook.fr` |
 | Emails (Brevo) | https://app.brevo.com | `oria.ei@outlook.fr` |
-| Hébergement (Netlify) | https://app.netlify.com | `oria.ei@outlook.fr` |
+| Nom de domaine (OVH) | https://www.ovh.com/manager/ | `oria.ei@outlook.fr` |
+| Ancien lien (redirige automatiquement) | https://cinema-en-pleine-air-opio.netlify.app | `oria.ei@outlook.fr` |
 | Code du site (GitHub) | https://github.com/r704ib/cinema-en-pleine-air-opio | `r704ib` |
 
 *Notes de version : dossier [`releases/`](releases/).*
