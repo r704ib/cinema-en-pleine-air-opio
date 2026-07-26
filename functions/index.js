@@ -186,9 +186,12 @@ exports.stopFeedback = onCall(async (request) => {
   if (typeof reservationId !== "string" || reservationId.length === 0) {
     throw new HttpsError("invalid-argument", "reservationId manquant");
   }
-  await db.collection("reservations").doc(reservationId).set(
-    { avisOptOut: true }, { merge: true }
-  );
+  const reservationRef = db.collection("reservations").doc(reservationId);
+  const snap = await reservationRef.get();
+  if (!snap.exists) {
+    throw new HttpsError("not-found", "RESERVATION_NOT_FOUND");
+  }
+  await reservationRef.update({ avisOptOut: true });
   logger.info("Feedback opt-out", { reservationId: reservationId });
   return { success: true };
 });
