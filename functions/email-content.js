@@ -1,7 +1,7 @@
 "use strict";
 
 const SITE_URL = "https://cinema-en-pleine-air-opio.oria-events.fr";
-const COMITE_EMAIL = "Oria.ei@outlook.fr";
+const ORIA_EMAIL = "Oria.ei@outlook.fr";
 
 function buildCancelUrl(reservationId) {
   return SITE_URL + "/annuler.html?id=" + reservationId;
@@ -26,9 +26,9 @@ function buildVisitorConfirmationEmail(reservation, reservationId) {
   };
 }
 
-function buildComiteNewReservationEmail(reservation) {
+function buildOriaNewReservationEmail(reservation) {
   return {
-    to: COMITE_EMAIL,
+    to: ORIA_EMAIL,
     subject: "Nouvelle réservation : " + reservation.prenom + " " + reservation.nom,
     htmlContent:
       "<p>Nouvelle réservation reçue.</p>" +
@@ -44,9 +44,9 @@ function buildComiteNewReservationEmail(reservation) {
   };
 }
 
-function buildComiteCancellationEmail(reservation) {
+function buildOriaCancellationEmail(reservation) {
   return {
-    to: COMITE_EMAIL,
+    to: ORIA_EMAIL,
     subject: "Annulation : " + reservation.prenom + " " + reservation.nom,
     htmlContent:
       "<p>Une réservation vient d'être annulée.</p>" +
@@ -60,6 +60,6 @@ function buildComiteCancellationEmail(reservation) {
 module.exports = {
   buildCancelUrl,
   buildVisitorConfirmationEmail,
-  buildComiteNewReservationEmail,
-  buildComiteCancellationEmail,
+  buildOriaNewReservationEmail,
+  buildOriaCancellationEmail,
 };

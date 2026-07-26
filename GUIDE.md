@@ -10,7 +10,7 @@ des mots simples.
 
 Les visiteurs réservent leurs places sur le site, le nombre de places restantes
 se met à jour **en direct** pour tout le monde, ils reçoivent un email de
-confirmation, et le comité reçoit un email à chaque réservation — le tout
+confirmation, et **toi (Oria)** reçois un email à chaque réservation — le tout
 enregistré dans une base de données sécurisée.
 
 - **Adresse du site :** https://cinema-en-pleine-air-opio.oria-events.fr
@@ -66,7 +66,7 @@ Imagine le projet comme un petit commerce — chaque service a un rôle précis 
       │                      │                  │                     │ 7. envoie
       │ ◄────────────────────┼──────────────────┼─────────────────── │  2 emails :
       │   email confirmation │                  │                     │  visiteur
-      │                      │                  │  email au comité ◄──┤  + comité
+      │                      │                  │  email à Oria ◄──────┤  + Oria
 ```
 
 1. Le visiteur remplit le formulaire sur le **site** et clique « Réserver ».
@@ -77,10 +77,10 @@ Imagine le projet comme un petit commerce — chaque service a un rôle précis 
 5. La **jauge se met à jour en direct** sur l'écran de tous les visiteurs
    (personne n'a besoin de recharger la page).
 6. et 7. **Brevo** envoie 2 emails : un au **visiteur** (avec son lien
-   d'annulation personnel), un au **comité**.
+   d'annulation personnel), un à **toi (Oria)**.
 
 L'**annulation** fonctionne pareil, à l'envers : le visiteur clique le lien reçu
-par email → sa place est libérée → le compteur baisse → le comité est notifié.
+par email → sa place est libérée → le compteur baisse → **tu es notifié(e)**.
 
 ---
 

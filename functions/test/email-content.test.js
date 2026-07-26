@@ -1,8 +1,8 @@
 const {
   buildCancelUrl,
   buildVisitorConfirmationEmail,
-  buildComiteNewReservationEmail,
-  buildComiteCancellationEmail,
+  buildOriaNewReservationEmail,
+  buildOriaCancellationEmail,
 } = require("../email-content");
 
 const sampleReservation = {
@@ -29,14 +29,14 @@ test("buildVisitorConfirmationEmail addresses the visitor and includes the cance
   expect(email.htmlContent).toContain("abc123");
 });
 
-test("buildComiteNewReservationEmail is addressed to the comité and lists quantities", () => {
-  const email = buildComiteNewReservationEmail(sampleReservation);
+test("buildOriaNewReservationEmail is addressed to Oria and lists quantities", () => {
+  const email = buildOriaNewReservationEmail(sampleReservation);
   expect(email.to).toBe("Oria.ei@outlook.fr");
   expect(email.htmlContent).toContain("Jean Dupont");
   expect(email.htmlContent).toContain("13 €");
 });
 
-test("buildComiteCancellationEmail mentions the freed places", () => {
-  const email = buildComiteCancellationEmail(sampleReservation);
+test("buildOriaCancellationEmail mentions the freed places", () => {
+  const email = buildOriaCancellationEmail(sampleReservation);
   expect(email.htmlContent).toContain("Places libérées : 3");
 });

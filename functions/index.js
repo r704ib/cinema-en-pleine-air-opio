@@ -9,8 +9,8 @@ const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { validateReservationInput, MAX_PLACES } = require("./reservation-logic");
 const {
   buildVisitorConfirmationEmail,
-  buildComiteNewReservationEmail,
-  buildComiteCancellationEmail,
+  buildOriaNewReservationEmail,
+  buildOriaCancellationEmail,
 } = require("./email-content");
 
 admin.initializeApp();
@@ -116,7 +116,7 @@ exports.onReservationCreated = onDocumentCreated(
     const apiKey = BREVO_API_KEY.value();
 
     await sendEmail(apiKey, buildVisitorConfirmationEmail(reservation, reservationId));
-    await sendEmail(apiKey, buildComiteNewReservationEmail(reservation));
+    await sendEmail(apiKey, buildOriaNewReservationEmail(reservation));
     logger.info("Reservation emails sent", { reservationId });
   }
 );
@@ -128,7 +128,7 @@ exports.onReservationCancelled = onDocumentUpdated(
     const after = event.data.after.data();
     if (before.status === "active" && after.status === "cancelled") {
       const apiKey = BREVO_API_KEY.value();
-      await sendEmail(apiKey, buildComiteCancellationEmail(after));
+      await sendEmail(apiKey, buildOriaCancellationEmail(after));
       logger.info("Cancellation email sent", { reservationId: event.params.reservationId });
     }
   }
