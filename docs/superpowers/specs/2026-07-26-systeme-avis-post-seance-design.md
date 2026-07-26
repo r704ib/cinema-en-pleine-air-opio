@@ -27,7 +27,7 @@ plusieurs communes.
 | Anonymat | Avis **lié à la réservation** (prénom/nom connus, non affichés publiquement) |
 | Consentement de publication | Case à cocher opt-in « J'autorise la publication de mon avis (prénom) ». Publication future en **prénom + initiale** (« Marie D. »), uniquement pour les avis consentis |
 | Relance | **Une seule** relance automatique des non-répondants, **3 jours** après la 1ʳᵉ demande (configurable) ; lien de désinscription inclus |
-| Canal QR sur place | Page d'avis générique accessible par QR code ; l'utilisateur **saisit lui-même** son prénom (avis non lié à une réservation) |
+| Canal QR sur place | Page d'avis générique accessible par QR code ; l'utilisateur saisit **seulement son email**. Le système déduit prénom/nom en cherchant l'email dans les réservations (et relie l'avis si trouvé) |
 | Adresse expéditeur | `reservations@opio.oria-events.fr` (déjà authentifiée DKIM/DMARC) |
 | Activation | Construit et testé maintenant ; **envoi automatique inerte pour Opio**, armé pour les prochaines séances |
 | Limite d'envoi | **50 emails/jour** (configurable), étalement automatique sur plusieurs jours ; relances incluses dans ce quota |
@@ -49,8 +49,8 @@ Cloud Functions** (Admin SDK, immunisé aux règles client).
    - **Mode email** : URL `…/avis.html?id=<reservationId>`. Lit la réservation
      (`getDoc`, autorisé par `allow get: if true`) pour accueillir la personne
      par son prénom ; le prénom/nom ne sont pas saisis (déjà connus).
-   - **Mode QR** : URL `…/avis.html?source=qr` (sans `id`). Affiche des champs
-     **prénom** (requis) et **nom** (optionnel) que l'utilisateur saisit.
+   - **Mode QR** : URL `…/avis.html?source=qr` (sans `id`). Affiche un champ
+     **email** (requis) ; le prénom/nom seront déduits côté serveur.
    - Formulaire commun : sélecteur d'étoiles 1-5 (requis), `textarea`
      commentaire, `textarea` film souhaité, **case à cocher opt-in** « J'autorise
      la publication de mon avis (prénom) sur le site », bouton « Envoyer mon
@@ -63,8 +63,9 @@ Cloud Functions** (Admin SDK, immunisé aux règles client).
    ```
    {
      source: "email" | "qr",       // origine de l'avis
-     reservationId: string | null, // lien vers la réservation (null en mode QR)
-     prenom: string,               // pré-rempli (email) ou saisi (QR)
+     reservationId: string | null, // lien vers la réservation (null si non identifié)
+     email: string,                // toujours renseigné (réservation ou saisi en QR)
+     prenom: string,               // déduit de la réservation ; vide si non identifié
      nom: string,                  // idem, peut être vide
      note: number,                 // entier 1..5
      commentaire: string,          // peut être vide
@@ -78,9 +79,15 @@ Cloud Functions** (Admin SDK, immunisé aux règles client).
    - **Mode email** (`reservationId` fourni) : vérifie que la réservation existe ;
      vérifie qu'aucun avis n'existe déjà pour ce `reservationId` (anti-doublon) ;
      sinon `HttpsError("failed-precondition", "ALREADY_SUBMITTED")`. Recopie
-     prénom/nom depuis la réservation (ignore ceux envoyés par le client).
-   - **Mode QR** (`source === "qr"`, pas de `reservationId`) : exige un `prenom`
-     non vide ; pas d'anti-doublon possible (limitation acceptée).
+     email/prénom/nom depuis la réservation (ignore ceux envoyés par le client).
+   - **Mode QR** (`source === "qr"`) : exige un `email` valide. Recherche une
+     réservation avec cet email (normalisé en minuscules) :
+     - **Trouvée** → relie l'avis (`reservationId`), recopie prénom/nom depuis la
+       réservation, marque la/les réservation(s) de cet email comme ayant répondu
+       (pas de relance). Anti-doublon par email : si un avis existe déjà pour cet
+       email → `ALREADY_SUBMITTED`.
+     - **Non trouvée** → avis enregistré avec l'email saisi, sans prénom/nom
+       (`reservationId: null`) ; restera anonyme (non publiable avec nom).
    - Valide la note (entier 1..5) et borne la longueur des textes (ex. 2000
      caractères) ; normalise `publication_autorisee` en booléen ; sinon
      `HttpsError("invalid-argument", ...)`.
@@ -188,8 +195,10 @@ Oria consulte / exporte "avis" en Excel
 
 
 Parcours QR (sur place) :
-QR affiché → avis.html?source=qr → l'utilisateur saisit prénom + ⭐+texte
-   → submitFeedback (source="qr", reservationId=null) → écrit dans "avis"
+QR affiché → avis.html?source=qr → l'utilisateur saisit son EMAIL + ⭐+texte
+   → submitFeedback (source="qr") → recherche l'email dans les réservations
+   → si trouvé : relie + déduit prénom/nom + marque "a répondu"
+   → si non trouvé : avis anonyme avec email → écrit dans "avis"
 ```
 
 ---
@@ -200,8 +209,9 @@ QR affiché → avis.html?source=qr → l'utilisateur saisit prénom + ⭐+texte
 |---|---|
 | Lien `avis.html` sans `id` **et** sans `source=qr` | Message « lien invalide » (comme `annuler.html`) |
 | Avis déjà soumis pour cette réservation (mode email) | Message « Vous avez déjà donné votre avis, merci ! » |
-| Mode QR : prénom vide | Bouton bloqué côté page + rejet `invalid-argument` côté fonction |
-| Mode QR : soumissions multiples | Acceptées (pas d'anti-doublon fiable sans identité) — limitation connue |
+| Mode QR : email vide ou invalide | Bouton bloqué côté page + rejet `invalid-argument` côté fonction |
+| Mode QR : email inconnu (pas de réservation) | Avis enregistré, mais anonyme (sans nom) — non publiable avec nom |
+| Mode QR : email déjà utilisé pour un avis | `ALREADY_SUBMITTED` (anti-doublon par email) |
 | Note absente / hors 1..5 | Bouton d'envoi bloqué côté page + rejet `invalid-argument` côté fonction |
 | Échec d'envoi Brevo (une réservation) | L'email en échec n'est **pas** marqué envoyé (retenté au prochain réveil) ; les autres continuent (pas de blocage global) |
 | `meta/session` absent ou `feedbackEnabled=false` | La fonction programmée ne fait rien (état normal inerte) |
@@ -214,7 +224,9 @@ QR affiché → avis.html?source=qr → l'utilisateur saisit prénom + ⭐+texte
 - **Unitaires (Jest, côté functions) :**
   - Validation de l'avis : note valide/invalide, textes trop longs, champs
     optionnels vides acceptés, `publication_autorisee` normalisé en booléen.
-  - Mode QR : prénom requis ; mode email : prénom/nom recopiés de la réservation.
+  - Mode QR : email requis ; correspondance email→réservation (trouvée = reliée
+    + nom déduit ; non trouvée = avis anonyme) ; anti-doublon par email.
+  - Mode email : prénom/nom recopiés de la réservation.
   - `buildFeedbackRequestEmail` / `buildFeedbackReminderEmail` : destinataire =
     email visiteur, lien `avis.html?id=…` présent ; la relance contient le lien
     de désinscription.
