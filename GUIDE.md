@@ -157,14 +157,23 @@ dans le dossier `releases/` pour garder une trace de ce qui a changé.
 
 ---
 
-## ✉️ À propos de l'adresse d'expéditeur des emails
+## ✉️ Adresses email
 
-Les emails partent au nom de **« Cinéma en plein air Opio »**. Selon les
-réglages de messagerie, certains destinataires peuvent voir une adresse
-technique (`…@brevosend.com`) plutôt que `oria.ei@outlook.fr`. C'est normal et
-sans gravité. Maintenant que tu as ton propre nom de domaine (`oria-events.fr`),
-il sera possible de configurer une adresse d'expéditeur 100 % personnalisée
-(ex. `contact@oria-events.fr`) — c'est une étape à part, pas encore faite.
+Le domaine `opio.oria-events.fr` est maintenant authentifié auprès de Brevo
+(DKIM). Deux adresses dédiées à la prestation Opio ont été créées, toutes deux
+redirigées automatiquement vers ta boîte `oria.ei@outlook.fr` (rien à changer
+dans tes habitudes) :
+
+| Adresse | Usage |
+|---|---|
+| `contact@opio.oria-events.fr` | Contact public, affiché sur le site |
+| `reservations@opio.oria-events.fr` | Expéditeur des emails automatiques (confirmation, annulation) |
+
+Le domaine racine `oria-events.fr` reste disponible pour de futurs événements
+organisés directement par Oria, sans commune cliente.
+
+> 💡 Pour trier automatiquement ces emails dans Outlook, crée des règles basées
+> sur le champ "À" (voir avec Claude si besoin d'aide pour les configurer).
 
 ---
 
@@ -175,6 +184,7 @@ il sera possible de configurer une adresse d'expéditeur 100 % personnalisée
 | Le site en ligne | https://cinema-en-pleine-air-opio.oria-events.fr | — (public) |
 | Base de données + statistiques | https://console.firebase.google.com | `oria.ei@outlook.fr` |
 | Emails (Brevo) | https://app.brevo.com | `oria.ei@outlook.fr` |
+| Réception des emails du site (redirigés) | — | `oria.ei@outlook.fr` |
 | Nom de domaine (OVH) | https://www.ovh.com/manager/ | `oria.ei@outlook.fr` |
 | Ancien lien (redirige automatiquement) | https://cinema-en-pleine-air-opio.netlify.app | `oria.ei@outlook.fr` |
 | Code du site (GitHub) | https://github.com/r704ib/cinema-en-pleine-air-opio | `r704ib` |

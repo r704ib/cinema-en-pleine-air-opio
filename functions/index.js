@@ -17,7 +17,7 @@ admin.initializeApp();
 const db = getFirestore();
 
 const BREVO_API_KEY = defineSecret("BREVO_API_KEY");
-const SENDER = { name: "Cinéma en plein air Opio", email: "Oria.ei@outlook.fr" };
+const SENDER = { name: "Cinéma en plein air Opio", email: "reservations@opio.oria-events.fr" };
 
 async function sendEmail(apiKey, email) {
   const response = await fetch("https://api.brevo.com/v3/smtp/email", {
