@@ -63,6 +63,7 @@ test("buildFeedbackRequestEmail targets the visitor and links to avis.html", () 
   expect(email.to).toBe("jean@example.com");
   expect(email.htmlContent).toContain("Jean");
   expect(email.htmlContent).toContain("/avis.html?id=abc123");
+  expect(email.htmlContent).toContain("Donner mon avis"); // bouton
 });
 
 test("buildFeedbackReminderEmail includes the avis link and an opt-out link", () => {
@@ -70,4 +71,5 @@ test("buildFeedbackReminderEmail includes the avis link and an opt-out link", ()
   expect(email.to).toBe("jean@example.com");
   expect(email.htmlContent).toContain("/avis.html?id=abc123");
   expect(email.htmlContent).toContain("stop=1");
+  expect(email.htmlContent).toContain("Ne plus recevoir"); // lien opt-out habille
 });

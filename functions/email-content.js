@@ -123,32 +123,46 @@ function buildVisitorCancellationEmail(reservation, reservationId) {
 
 function buildFeedbackRequestEmail(reservation, reservationId) {
   const url = SITE_URL + "/avis.html?id=" + reservationId;
+  const corps =
+    '<p style="font-size:17px; line-height:1.5; margin:0 0 14px;">Bonjour <strong>' +
+    reservation.prenom + "</strong>,</p>" +
+    '<p style="font-size:16px; line-height:1.6; color:#3b3152; margin:0 0 28px;">' +
+    "Merci d'être venu(e) à la séance&nbsp;! Votre retour nous aide beaucoup à préparer de plus " +
+    "belles projections. Cela ne prend qu'une minute.</p>" +
+    '<div style="text-align:center;">' + bouton("Donner mon avis", url) + "</div>";
   return {
     to: reservation.email,
     subject: "Votre avis sur le Cinéma en plein air d'Opio",
-    htmlContent:
-      "<p>Bonjour " + reservation.prenom + ",</p>" +
-      "<p>Merci d'être venu(e) à la séance ! Votre avis nous aiderait beaucoup à " +
-      "améliorer les prochaines projections.</p>" +
-      "<p>Cela ne prend qu'une minute : " +
-      "<a href=\"" + url + "\">donnez votre avis ici</a>.</p>" +
-      "<p>À très vite sous les étoiles d'Opio !</p>",
+    htmlContent: emailShell({
+      titre: 'Votre avis compte <span style="color:#E8A33D;">&#10022;</span>',
+      preheader: "Votre avis nous aiderait beaucoup à améliorer les prochaines séances.",
+      corpsHtml: corps,
+    }),
   };
 }
 
 function buildFeedbackReminderEmail(reservation, reservationId) {
   const url = SITE_URL + "/avis.html?id=" + reservationId;
   const stopUrl = url + "&stop=1";
+  const corps =
+    '<p style="font-size:17px; line-height:1.5; margin:0 0 14px;">Bonjour <strong>' +
+    reservation.prenom + "</strong>,</p>" +
+    '<p style="font-size:16px; line-height:1.6; color:#3b3152; margin:0 0 28px;">' +
+    "Vous n'avez pas encore donné votre avis sur la séance — votre retour compte beaucoup " +
+    "pour nous&nbsp;! Une minute suffit.</p>" +
+    '<div style="text-align:center;">' + bouton("Donner mon avis", url) + "</div>";
+  const piedExtra =
+    '<br><a href="' + stopUrl + '" style="color:#7d7196; text-decoration:underline; font-size:11px;">' +
+    "Ne plus recevoir ces messages</a>";
   return {
     to: reservation.email,
     subject: "Petit rappel : votre avis sur le Cinéma en plein air d'Opio",
-    htmlContent:
-      "<p>Bonjour " + reservation.prenom + ",</p>" +
-      "<p>Vous n'avez pas encore donné votre avis sur la séance — votre retour " +
-      "compte beaucoup pour nous !</p>" +
-      "<p><a href=\"" + url + "\">Donner mon avis</a> (une minute suffit).</p>" +
-      "<p>Si vous ne souhaitez plus recevoir ces messages, " +
-      "<a href=\"" + stopUrl + "\">cliquez ici</a>.</p>",
+    htmlContent: emailShell({
+      titre: 'Petit rappel <span style="color:#E8A33D;">&#10022;</span>',
+      preheader: "Votre avis compte beaucoup pour nous.",
+      corpsHtml: corps,
+      piedExtraHtml: piedExtra,
+    }),
   };
 }
 
