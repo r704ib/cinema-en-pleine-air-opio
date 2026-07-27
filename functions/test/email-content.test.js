@@ -20,13 +20,20 @@ const sampleReservation = {
   montantEstime: 13,
 };
 
+const sampleEvent = {
+  dateLabel: "Mardi 18 août 2026",
+  filmTitre: "Jumanji : Bienvenue dans la jungle",
+  lieu: "Cœur du village à Opio 06650",
+  portes: "20h30", filmHeure: "21h30", finHeure: "~23h15",
+};
+
 test("buildCancelUrl includes the reservation id", () => {
   const url = buildCancelUrl("abc123");
   expect(url).toBe("https://cinema-en-pleine-air-opio.oria-events.fr/annuler.html?id=abc123");
 });
 
 test("buildVisitorConfirmationEmail : billet, infos pratiques et lien d'annulation", () => {
-  const email = buildVisitorConfirmationEmail(sampleReservation, "abc123");
+  const email = buildVisitorConfirmationEmail(sampleReservation, "abc123", sampleEvent);
   expect(email.to).toBe("jean@example.com");
   expect(email.htmlContent).toContain("3 places");
   expect(email.htmlContent).toContain("2 adultes");
@@ -41,10 +48,18 @@ test("buildVisitorConfirmationEmail : billet, infos pratiques et lien d'annulati
 test("buildVisitorConfirmationEmail : singulier quand une seule place", () => {
   const email = buildVisitorConfirmationEmail(
     { ...sampleReservation, nb_adultes: 1, nb_enfants_3_10: 0, nb_enfants_moins_3: 0, totalPlaces: 1, montantEstime: 5 },
-    "abc123"
+    "abc123",
+    sampleEvent
   );
   expect(email.htmlContent).toContain("1 place");
   expect(email.htmlContent).not.toContain("1 places");
+});
+
+test("la confirmation utilise la date et le film de l'evenement", () => {
+  const email = buildVisitorConfirmationEmail(sampleReservation, "abc123", sampleEvent);
+  expect(email.htmlContent).toContain("Mardi 18 août 2026");
+  expect(email.htmlContent).toContain("Jumanji : Bienvenue dans la jungle");
+  expect(email.htmlContent).not.toContain("28 juillet");
 });
 
 test("buildOriaNewReservationEmail is addressed to Oria and lists quantities", () => {
@@ -60,7 +75,7 @@ test("buildOriaCancellationEmail mentions the freed places", () => {
 });
 
 test("buildVisitorCancellationEmail : destine au visiteur, mentionne les places liberees", () => {
-  const email = buildVisitorCancellationEmail(sampleReservation, "abc123");
+  const email = buildVisitorCancellationEmail(sampleReservation, "abc123", sampleEvent);
   expect(email.to).toBe("jean@example.com");
   expect(email.htmlContent).toContain("Annulation");
   expect(email.htmlContent).toContain("3 places");
@@ -68,7 +83,7 @@ test("buildVisitorCancellationEmail : destine au visiteur, mentionne les places 
 });
 
 test("buildFeedbackRequestEmail targets the visitor and links to avis.html", () => {
-  const email = buildFeedbackRequestEmail({ email: "jean@example.com", prenom: "Jean" }, "abc123");
+  const email = buildFeedbackRequestEmail({ email: "jean@example.com", prenom: "Jean" }, "abc123", sampleEvent);
   expect(email.to).toBe("jean@example.com");
   expect(email.htmlContent).toContain("Jean");
   expect(email.htmlContent).toContain("/avis.html?id=abc123");
@@ -76,7 +91,7 @@ test("buildFeedbackRequestEmail targets the visitor and links to avis.html", () 
 });
 
 test("buildFeedbackReminderEmail includes the avis link and an opt-out link", () => {
-  const email = buildFeedbackReminderEmail({ email: "jean@example.com", prenom: "Jean" }, "abc123");
+  const email = buildFeedbackReminderEmail({ email: "jean@example.com", prenom: "Jean" }, "abc123", sampleEvent);
   expect(email.to).toBe("jean@example.com");
   expect(email.htmlContent).toContain("/avis.html?id=abc123");
   expect(email.htmlContent).toContain("stop=1");
