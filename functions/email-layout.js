@@ -82,6 +82,15 @@ function pied(piedExtraHtml) {
 function emailShell(options) {
   const preheader = options.preheader || "";
   return (
+    '<!DOCTYPE html><html lang="fr"><head>' +
+    '<meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+    // Empêche les messageries d'inverser nos couleurs en mode sombre :
+    // on déclare gérer nous-mêmes le clair ET le sombre.
+    '<meta name="color-scheme" content="light dark">' +
+    '<meta name="supported-color-schemes" content="light dark">' +
+    "<style>:root{color-scheme:light dark;supported-color-schemes:light dark;}</style>" +
+    '</head><body style="margin:0; padding:0;">' +
     '<div style="display:none; max-height:0; overflow:hidden; opacity:0;">' + preheader + "</div>" +
     '<table role="presentation" width="600" cellpadding="0" cellspacing="0" align="center" bgcolor="' + C.creme + '" style="width:600px; max-width:100%; margin:0 auto; background-color:' +
     C.creme + '; border-radius:14px; overflow:hidden;">' +
@@ -93,7 +102,8 @@ function emailShell(options) {
     "</td></tr>" +
     '<tr><td bgcolor="' + C.creme + '" style="background-color:' + C.creme + '; padding:34px 40px 30px; color:' + C.violet + '; font-family:Arial,Helvetica,sans-serif;">' + options.corpsHtml + "</td></tr>" +
     pied(options.piedExtraHtml) +
-    "</table>"
+    "</table>" +
+    "</body></html>"
   );
 }
 

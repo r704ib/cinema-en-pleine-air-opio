@@ -58,6 +58,8 @@ test("emailShell contient titre, preheader, corps et pied Oria", () => {
   // porter l'attribut bgcolor, pas seulement le CSS.
   expect(html).toContain('bgcolor="#241A38"');
   expect(html).toContain('bgcolor="#FBF7EF"');
+  // Mode sombre : on déclare gérer nous-mêmes les couleurs (pas d'inversion forcée).
+  expect(html).toContain("color-scheme");
 });
 
 test("emailShell insere le pied additionnel (opt-out) quand fourni", () => {

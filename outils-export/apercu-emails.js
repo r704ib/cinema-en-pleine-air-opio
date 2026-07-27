@@ -21,11 +21,15 @@ const emails = [
   ["4 · Relance d'avis", buildFeedbackReminderEmail(r, id)],
 ];
 
+// Chaque email est un document HTML complet (avec sa balise color-scheme) :
+// on l'isole dans une iframe pour un aperçu fidèle.
+const esc = function (s) { return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;"); };
 const sections = emails.map(function (e) {
   return '<div style="max-width:640px;margin:0 auto;padding:8px 20px;"><div style="background:#241A38;color:#E8A33D;' +
     'font-size:12px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;padding:8px 14px;border-radius:8px;">' +
     e[0] + " — <em>" + e[1].subject + "</em></div></div>" +
-    '<div style="padding:14px 0 34px;">' + e[1].htmlContent + "</div>";
+    '<div style="padding:14px 0 34px;"><iframe srcdoc="' + esc(e[1].htmlContent) +
+    '" style="width:100%;max-width:640px;height:1000px;border:0;display:block;margin:0 auto;background:#fff;"></iframe></div>';
 }).join("");
 
 const page = "<!DOCTYPE html><html lang=\"fr\"><head><meta charset=\"utf-8\">" +
