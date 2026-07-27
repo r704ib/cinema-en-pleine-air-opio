@@ -49,13 +49,13 @@ async function main() {
   // 3. Backfill eventId sur les réservations sans eventId
   const resSnap = await db.collection("reservations").get();
   let batch = db.batch(); let count = 0; let total = 0;
-  resSnap.forEach(function (d) {
+  for (const d of resSnap.docs) {
     if (!d.data().eventId) {
       batch.update(d.ref, { eventId: EVENT_28 });
       count++; total++;
-      if (count === 400) { batch.commit(); batch = db.batch(); count = 0; }
+      if (count === 400) { await batch.commit(); batch = db.batch(); count = 0; }
     }
-  });
+  }
   if (count > 0) await batch.commit();
   console.log("✅ Backfill eventId sur " + total + " réservation(s)");
 }
