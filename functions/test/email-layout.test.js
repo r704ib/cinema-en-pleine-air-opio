@@ -54,6 +54,10 @@ test("emailShell contient titre, preheader, corps et pied Oria", () => {
   expect(html).toContain("<p>Contenu</p>");
   expect(html).toContain("Oria");
   expect(html).toContain("contact@opio.oria-events.fr");
+  // Compat Outlook bureau (moteur Word) : les fonds colorés doivent aussi
+  // porter l'attribut bgcolor, pas seulement le CSS.
+  expect(html).toContain('bgcolor="#241A38"');
+  expect(html).toContain('bgcolor="#FBF7EF"');
 });
 
 test("emailShell insere le pied additionnel (opt-out) quand fourni", () => {

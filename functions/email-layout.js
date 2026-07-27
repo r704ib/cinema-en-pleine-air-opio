@@ -35,8 +35,8 @@ function blocBillet(options) {
       '" width="180" height="180" alt="QR code d\'entree" style="width:180px; height:180px;"></div>'
     : "";
   return (
-    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:2px solid ' +
-    C.or + '; border-radius:12px; background:#fff;"><tr><td style="padding:22px 26px;">' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" style="border:2px solid ' +
+    C.or + '; border-radius:12px; background-color:#FFFFFF;"><tr><td style="padding:22px 26px;">' +
     '<div style="font-size:12px; letter-spacing:2px; color:' + C.orFonce +
     '; font-weight:bold; text-transform:uppercase;">Votre billet</div>' +
     '<div style="font-family:Georgia,serif; font-size:24px; color:' + C.violet +
@@ -66,7 +66,7 @@ function blocInfos(lignes) {
 
 function pied(piedExtraHtml) {
   return (
-    '<tr><td style="background:' + C.violet + '; padding:26px 40px; text-align:center;">' +
+    '<tr><td bgcolor="' + C.violet + '" style="background-color:' + C.violet + '; padding:26px 40px; text-align:center;">' +
     '<div style="font-family:Georgia,serif; font-size:16px; font-style:italic; color:' + C.ivoire +
     ';">À très vite sous les étoiles d\'Opio <span style="color:' + C.or + ';">&#10022;</span></div>' +
     '<div style="font-size:12px; color:' + C.lavande + '; margin-top:14px; line-height:1.7; font-family:Arial,Helvetica,sans-serif;">' +
@@ -83,15 +83,15 @@ function emailShell(options) {
   const preheader = options.preheader || "";
   return (
     '<div style="display:none; max-height:0; overflow:hidden; opacity:0;">' + preheader + "</div>" +
-    '<table role="presentation" width="600" cellpadding="0" cellspacing="0" align="center" style="width:600px; max-width:100%; margin:0 auto; background:' +
+    '<table role="presentation" width="600" cellpadding="0" cellspacing="0" align="center" bgcolor="' + C.creme + '" style="width:600px; max-width:100%; margin:0 auto; background-color:' +
     C.creme + '; border-radius:14px; overflow:hidden;">' +
-    '<tr><td style="background:' + C.violet + '; padding:34px 40px 30px; text-align:center;">' +
+    '<tr><td bgcolor="' + C.violet + '" style="background-color:' + C.violet + '; padding:34px 40px 30px; text-align:center;">' +
     '<div style="font-size:12px; letter-spacing:3px; color:' + C.or +
     '; font-weight:bold; text-transform:uppercase;">Cinéma en plein air · Opio</div>' +
     '<div style="font-family:Georgia,serif; font-size:30px; font-style:italic; color:' + C.ivoire +
     '; margin-top:12px;">' + options.titre + "</div>" +
     "</td></tr>" +
-    '<tr><td style="padding:34px 40px 30px; color:' + C.violet + '; font-family:Arial,Helvetica,sans-serif;">' + options.corpsHtml + "</td></tr>" +
+    '<tr><td bgcolor="' + C.creme + '" style="background-color:' + C.creme + '; padding:34px 40px 30px; color:' + C.violet + '; font-family:Arial,Helvetica,sans-serif;">' + options.corpsHtml + "</td></tr>" +
     pied(options.piedExtraHtml) +
     "</table>"
   );
