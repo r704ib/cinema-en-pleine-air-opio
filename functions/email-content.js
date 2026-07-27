@@ -42,7 +42,7 @@ function buildVisitorConfirmationEmail(reservation, reservationId) {
   const billet = blocBillet({
     reference: referenceDepuisId(reservationId),
     lignesHtml:
-      "<strong>" + reservation.totalPlaces + " places</strong> · " + detailPlaces(reservation) + "<br>" +
+      "<strong>" + reservation.totalPlaces + (reservation.totalPlaces > 1 ? " places" : " place") + "</strong> · " + detailPlaces(reservation) + "<br>" +
       "À régler sur place : <strong>" + reservation.montantEstime + " €</strong>",
   });
   const corps =
@@ -105,7 +105,7 @@ function buildVisitorCancellationEmail(reservation, reservationId) {
     reservation.prenom + "</strong>,</p>" +
     '<p style="font-size:16px; line-height:1.6; color:#3b3152; margin:0 0 14px;">' +
     "Votre annulation pour la séance du <strong>mardi 28 juillet 2026</strong> est bien prise " +
-    "en compte. Vos <strong>" + reservation.totalPlaces + " places</strong> ont été libérées — " +
+    "en compte. Vos <strong>" + reservation.totalPlaces + (reservation.totalPlaces > 1 ? " places" : " place") + "</strong> ont été libérées — " +
     "merci de nous avoir prévenus.</p>" +
     '<p style="font-size:16px; line-height:1.6; color:#3b3152; margin:0 0 28px;">' +
     "On espère vous retrouver à une prochaine projection sous les étoiles d'Opio&nbsp;!</p>" +
@@ -152,7 +152,7 @@ function buildFeedbackReminderEmail(reservation, reservationId) {
     "pour nous&nbsp;! Une minute suffit.</p>" +
     '<div style="text-align:center;">' + bouton("Donner mon avis", url) + "</div>";
   const piedExtra =
-    '<br><a href="' + stopUrl + '" style="color:#7d7196; text-decoration:underline; font-size:11px;">' +
+    '<br><a href="' + stopUrl + '" style="color:#B8AFC9; text-decoration:underline; font-size:11px;">' +
     "Ne plus recevoir ces messages</a>";
   return {
     to: reservation.email,

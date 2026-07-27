@@ -38,6 +38,15 @@ test("buildVisitorConfirmationEmail : billet, infos pratiques et lien d'annulati
   expect(email.htmlContent).toContain("annuler.html?id=abc123");
 });
 
+test("buildVisitorConfirmationEmail : singulier quand une seule place", () => {
+  const email = buildVisitorConfirmationEmail(
+    { ...sampleReservation, nb_adultes: 1, nb_enfants_3_10: 0, nb_enfants_moins_3: 0, totalPlaces: 1, montantEstime: 5 },
+    "abc123"
+  );
+  expect(email.htmlContent).toContain("1 place");
+  expect(email.htmlContent).not.toContain("1 places");
+});
+
 test("buildOriaNewReservationEmail is addressed to Oria and lists quantities", () => {
   const email = buildOriaNewReservationEmail(sampleReservation);
   expect(email.to).toBe("Oria.ei@outlook.fr");

@@ -69,7 +69,7 @@ function pied(piedExtraHtml) {
     '<tr><td style="background:' + C.violet + '; padding:26px 40px; text-align:center;">' +
     '<div style="font-family:Georgia,serif; font-size:16px; font-style:italic; color:' + C.ivoire +
     ';">À très vite sous les étoiles d\'Opio <span style="color:' + C.or + ';">&#10022;</span></div>' +
-    '<div style="font-size:12px; color:' + C.lavande + '; margin-top:14px; line-height:1.7;">' +
+    '<div style="font-size:12px; color:' + C.lavande + '; margin-top:14px; line-height:1.7; font-family:Arial,Helvetica,sans-serif;">' +
     'Cinéma en plein air · Opio — une prestation <strong style="color:' + C.or + ';">Oria</strong><br>' +
     '<a href="mailto:' + CONTACT_EMAIL + '" style="color:' + C.muted + '; text-decoration:underline;">' +
     CONTACT_EMAIL + "</a> &nbsp;·&nbsp; " +
@@ -91,7 +91,7 @@ function emailShell(options) {
     '<div style="font-family:Georgia,serif; font-size:30px; font-style:italic; color:' + C.ivoire +
     '; margin-top:12px;">' + options.titre + "</div>" +
     "</td></tr>" +
-    '<tr><td style="padding:34px 40px 30px; color:' + C.violet + ';">' + options.corpsHtml + "</td></tr>" +
+    '<tr><td style="padding:34px 40px 30px; color:' + C.violet + '; font-family:Arial,Helvetica,sans-serif;">' + options.corpsHtml + "</td></tr>" +
     pied(options.piedExtraHtml) +
     "</table>"
   );

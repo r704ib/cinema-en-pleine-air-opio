@@ -65,3 +65,8 @@ test("emailShell insere le pied additionnel (opt-out) quand fourni", () => {
   expect(html).toContain("https://exemple.fr/stop");
   expect(html).toContain("Ne plus recevoir");
 });
+
+test("emailShell applique une police de repli sans-serif au corps (Outlook)", () => {
+  const html = emailShell({ titre: "T", corpsHtml: "x" });
+  expect(html).toContain("Arial");
+});
