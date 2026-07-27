@@ -29,6 +29,13 @@ const db = getFirestore();
 const BREVO_API_KEY = defineSecret("BREVO_API_KEY");
 const SENDER = { name: "Cinéma en plein air Opio", email: "reservations@opio.oria-events.fr" };
 
+const DEFAULT_EVENT_ID = "opio-2026-07-28";
+
+async function loadEvent(eventId) {
+  const snap = await db.collection("events").doc(eventId).get();
+  return snap.exists ? Object.assign({ id: eventId }, snap.data()) : null;
+}
+
 async function sendEmail(apiKey, email) {
   const response = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
@@ -51,34 +58,43 @@ async function sendEmail(apiKey, email) {
 }
 
 exports.createReservation = onCall(async (request) => {
-  const result = validateReservationInput(request.data);
+  const eventId = request.data && request.data.eventId;
+  if (typeof eventId !== "string" || eventId.length === 0) {
+    throw new HttpsError("invalid-argument", "eventId manquant");
+  }
+  const event = await loadEvent(eventId);
+  if (!event) {
+    throw new HttpsError("not-found", "EVENT_NOT_FOUND");
+  }
+  if (event.ouvertResa !== true) {
+    throw new HttpsError("failed-precondition", "RESA_FERMEE");
+  }
+
+  const result = validateReservationInput(request.data, event.maxParResa);
   if (!result.valid) {
     throw new HttpsError("invalid-argument", "Données de réservation invalides: " + result.errors.join(", "));
   }
 
-  const gaugeRef = db.collection("meta").doc("gauge");
+  const eventRef = db.collection("events").doc(eventId);
   const reservationRef = db.collection("reservations").doc();
 
   await db.runTransaction(async (tx) => {
-    const gaugeSnap = await tx.get(gaugeRef);
-    const reserved = gaugeSnap.exists ? gaugeSnap.data().reserved : 0;
-    if (reserved + result.reservation.totalPlaces > MAX_PLACES) {
+    const eventSnap = await tx.get(eventRef);
+    const reserved = eventSnap.exists && eventSnap.data().reserved ? eventSnap.data().reserved : 0;
+    const gaugeMax = eventSnap.data().gaugeMax;
+    if (reserved + result.reservation.totalPlaces > gaugeMax) {
       throw new HttpsError("resource-exhausted", "FULL");
     }
     tx.set(reservationRef, Object.assign({}, result.reservation, {
       createdAt: FieldValue.serverTimestamp(),
     }));
-    tx.set(
-      gaugeRef,
-      {
-        reserved: reserved + result.reservation.totalPlaces,
-        updatedAt: FieldValue.serverTimestamp(),
-      },
-      { merge: true }
-    );
+    tx.update(eventRef, {
+      reserved: reserved + result.reservation.totalPlaces,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
   });
 
-  logger.info("Reservation created", { reservationId: reservationRef.id });
+  logger.info("Reservation created", { reservationId: reservationRef.id, eventId });
   return { id: reservationRef.id };
 });
 
@@ -89,32 +105,29 @@ exports.cancelReservation = onCall(async (request) => {
   }
 
   const reservationRef = db.collection("reservations").doc(reservationId);
-  const gaugeRef = db.collection("meta").doc("gauge");
 
   await db.runTransaction(async (tx) => {
     const reservationSnap = await tx.get(reservationRef);
     if (!reservationSnap.exists || reservationSnap.data().status !== "active") {
       throw new HttpsError("failed-precondition", "ALREADY_CANCELLED");
     }
-    const gaugeSnap = await tx.get(gaugeRef);
-    const reserved = gaugeSnap.exists ? gaugeSnap.data().reserved : 0;
-    const totalPlaces = reservationSnap.data().totalPlaces;
+    const data = reservationSnap.data();
+    const eventId = data.eventId || DEFAULT_EVENT_ID;
+    const eventRef = db.collection("events").doc(eventId);
+    const eventSnap = await tx.get(eventRef);
+    const reserved = eventSnap.exists && eventSnap.data().reserved ? eventSnap.data().reserved : 0;
 
     tx.update(reservationRef, {
       status: "cancelled",
       cancelledAt: FieldValue.serverTimestamp(),
     });
-    tx.set(
-      gaugeRef,
-      {
-        reserved: Math.max(0, reserved - totalPlaces),
-        updatedAt: FieldValue.serverTimestamp(),
-      },
-      { merge: true }
-    );
+    tx.update(eventRef, {
+      reserved: Math.max(0, reserved - data.totalPlaces),
+      updatedAt: FieldValue.serverTimestamp(),
+    });
   });
 
-  logger.info("Reservation cancelled", { reservationId: reservationId });
+  logger.info("Reservation cancelled", { reservationId });
   return { success: true };
 });
 
@@ -203,8 +216,9 @@ exports.onReservationCreated = onDocumentCreated(
     const reservation = event.data.data();
     const reservationId = event.params.reservationId;
     const apiKey = BREVO_API_KEY.value();
+    const ev = await loadEvent(reservation.eventId || DEFAULT_EVENT_ID);
 
-    await sendEmail(apiKey, buildVisitorConfirmationEmail(reservation, reservationId));
+    await sendEmail(apiKey, buildVisitorConfirmationEmail(reservation, reservationId, ev));
     await sendEmail(apiKey, buildOriaNewReservationEmail(reservation));
     logger.info("Reservation emails sent", { reservationId });
   }
@@ -218,8 +232,9 @@ exports.onReservationCancelled = onDocumentUpdated(
     if (before.status === "active" && after.status === "cancelled") {
       const apiKey = BREVO_API_KEY.value();
       const reservationId = event.params.reservationId;
+      const ev = await loadEvent(after.eventId || DEFAULT_EVENT_ID);
       try {
-        await sendEmail(apiKey, buildVisitorCancellationEmail(after, reservationId));
+        await sendEmail(apiKey, buildVisitorCancellationEmail(after, reservationId, ev));
       } catch (err) {
         logger.error("Cancellation visitor email failed", { reservationId, error: String(err) });
       }
@@ -246,6 +261,7 @@ exports.sendFeedbackRequests = onSchedule(
       logger.info("Feedback: envoi désactivé (feedbackEnabled != true)");
       return;
     }
+    const ev = await loadEvent(session.eventId || DEFAULT_EVENT_ID);
 
     const resSnap = await db.collection("reservations").get();
     const reservations = resSnap.docs.map(function (d) {
@@ -284,13 +300,13 @@ exports.sendFeedbackRequests = onSchedule(
       const reservation = { email: rec.email, prenom: rec.prenom };
       try {
         if (rec.type === "request") {
-          await sendEmail(apiKey, buildFeedbackRequestEmail(reservation, rec.reservationId));
+          await sendEmail(apiKey, buildFeedbackRequestEmail(reservation, rec.reservationId, ev));
           await db.collection("reservations").doc(rec.reservationId).set(
             { avisRequestSent: true, avisRequestSentAt: FieldValue.serverTimestamp() },
             { merge: true }
           );
         } else {
-          await sendEmail(apiKey, buildFeedbackReminderEmail(reservation, rec.reservationId));
+          await sendEmail(apiKey, buildFeedbackReminderEmail(reservation, rec.reservationId, ev));
           await db.collection("reservations").doc(rec.reservationId).set(
             { avisRelanceSent: true, avisRelanceSentAt: FieldValue.serverTimestamp() },
             { merge: true }
