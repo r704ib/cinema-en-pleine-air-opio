@@ -24,11 +24,17 @@ test("buildCancelUrl includes the reservation id", () => {
   expect(url).toBe("https://cinema-en-pleine-air-opio.oria-events.fr/annuler.html?id=abc123");
 });
 
-test("buildVisitorConfirmationEmail addresses the visitor and includes the cancel link", () => {
+test("buildVisitorConfirmationEmail : billet, infos pratiques et lien d'annulation", () => {
   const email = buildVisitorConfirmationEmail(sampleReservation, "abc123");
   expect(email.to).toBe("jean@example.com");
-  expect(email.htmlContent).toContain("3 place(s)");
-  expect(email.htmlContent).toContain("abc123");
+  expect(email.htmlContent).toContain("3 places");
+  expect(email.htmlContent).toContain("2 adultes");
+  expect(email.htmlContent).toContain("1 enfant (3-10 ans)");
+  expect(email.htmlContent).toContain("ABC123"); // reference
+  expect(email.htmlContent).toContain("13 €"); // montant
+  expect(email.htmlContent).toContain("Opio 06650");
+  expect(email.htmlContent).toContain("21h30");
+  expect(email.htmlContent).toContain("annuler.html?id=abc123");
 });
 
 test("buildOriaNewReservationEmail is addressed to Oria and lists quantities", () => {

@@ -3,26 +3,68 @@
 const SITE_URL = "https://cinema-en-pleine-air-opio.oria-events.fr";
 const ORIA_EMAIL = "Oria.ei@outlook.fr";
 
+const {
+  emailShell,
+  bouton,
+  blocBillet,
+  blocInfos,
+  referenceDepuisId,
+} = require("./email-layout");
+
+function detailPlaces(r) {
+  const parts = [];
+  if (r.nb_adultes > 0) {
+    parts.push(r.nb_adultes + (r.nb_adultes > 1 ? " adultes" : " adulte"));
+  }
+  if (r.nb_enfants_3_10 > 0) {
+    parts.push(r.nb_enfants_3_10 + (r.nb_enfants_3_10 > 1 ? " enfants" : " enfant") + " (3-10 ans)");
+  }
+  if (r.nb_enfants_moins_3 > 0) {
+    parts.push(r.nb_enfants_moins_3 + (r.nb_enfants_moins_3 > 1 ? " enfants" : " enfant") + " (moins de 3 ans)");
+  }
+  return parts.join(", ");
+}
+
+const INFOS_PRATIQUES = [
+  { picto: "&#128205;", texteHtml: "Cœur du village, <strong>Opio 06650</strong>" },
+  { picto: "&#128368;", texteHtml: "Portes <strong>20h30</strong> · Film <strong>21h30</strong> · Fin ~23h15" },
+  { picto: "&#128663;", texteHtml: "Parking à proximité (Carrefour et Salle polyvalente)" },
+  { picto: "&#127871;", texteHtml: "Buvette sur place · chaises fournies" },
+  { picto: "&#129509;", texteHtml: "Prévoyez de quoi vous couvrir si les températures baissent" },
+];
+
 function buildCancelUrl(reservationId) {
   return SITE_URL + "/annuler.html?id=" + reservationId;
 }
 
 function buildVisitorConfirmationEmail(reservation, reservationId) {
   const cancelUrl = buildCancelUrl(reservationId);
+  const billet = blocBillet({
+    reference: referenceDepuisId(reservationId),
+    lignesHtml:
+      "<strong>" + reservation.totalPlaces + " places</strong> · " + detailPlaces(reservation) + "<br>" +
+      "À régler sur place : <strong>" + reservation.montantEstime + " €</strong>",
+  });
+  const corps =
+    '<p style="font-size:17px; line-height:1.5; margin:0 0 14px;">Bonjour <strong>' +
+    reservation.prenom + "</strong>,</p>" +
+    '<p style="font-size:16px; line-height:1.6; color:#3b3152; margin:0 0 26px;">' +
+    "Votre réservation pour la projection de <strong>« Un p'tit truc en plus »</strong> le " +
+    "<strong>mardi 28 juillet 2026</strong> est bien confirmée. On a hâte de vous accueillir " +
+    "sous les étoiles d'Opio&nbsp;!</p>" +
+    billet +
+    '<div style="margin:30px 0 6px;">' + blocInfos(INFOS_PRATIQUES) + "</div>" +
+    '<p style="font-size:15px; color:#3b3152; margin:26px 0 16px; text-align:center;">' +
+    "Un empêchement&nbsp;? Merci de libérer votre place pour d'autres spectateurs.</p>" +
+    '<div style="text-align:center;">' + bouton("Annuler ma réservation", cancelUrl) + "</div>";
   return {
     to: reservation.email,
     subject: "Votre réservation pour le Cinéma en plein air d'Opio",
-    htmlContent:
-      "<p>Bonjour " + reservation.prenom + ",</p>" +
-      "<p>Votre réservation pour le 28 juillet 2026 est confirmée : " +
-      reservation.totalPlaces + " place(s) (" +
-      reservation.nb_adultes + " adulte(s), " +
-      reservation.nb_enfants_3_10 + " enfant(s) 3-10 ans, " +
-      reservation.nb_enfants_moins_3 + " enfant(s) moins de 3 ans).</p>" +
-      "<p>Montant estimé à régler sur place : " + reservation.montantEstime + " €.</p>" +
-      "<p>Si vous ne pouvez finalement pas venir, merci d'annuler votre place ici : " +
-      "<a href=\"" + cancelUrl + "\">" + cancelUrl + "</a></p>" +
-      "<p>À très vite sous les étoiles d'Opio !</p>",
+    htmlContent: emailShell({
+      titre: 'Réservation confirmée <span style="color:#E8A33D;">&#10022;</span>',
+      preheader: "Votre réservation pour le Cinéma en plein air d'Opio est confirmée.",
+      corpsHtml: corps,
+    }),
   };
 }
 
