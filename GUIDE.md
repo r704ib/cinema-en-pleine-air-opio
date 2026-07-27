@@ -175,6 +175,22 @@ organisés directement par Oria, sans commune cliente.
 > 💡 Pour trier automatiquement ces emails dans Outlook, crée des règles basées
 > sur le champ "À" (voir avec Claude si besoin d'aide pour les configurer).
 
+### 📧 Apparence des emails — limite connue (mode sombre Outlook)
+
+Les emails envoyés aux visiteurs (confirmation, annulation, avis) sont mis en
+forme à la charte du site (en-tête violet/or, fond crème, bouton doré). Ils
+s'affichent correctement sur **Gmail, Apple Mail, iOS, Outlook Web** et
+**Outlook en mode clair**.
+
+**Limite connue et acceptée :** en **mode sombre sur l'application Outlook
+bureau (Windows)**, les couleurs peuvent rester légèrement altérées (fond
+recoloré). C'est dû au moteur de rendu de Microsoft Word utilisé par Outlook,
+qui ignore en partie les réglages standards anti-inversion (`color-scheme`,
+`bgcolor`) que nous avons pourtant ajoutés. **Aucune technique ne permet un
+contrôle à 100 %** sur ce client précis — c'est une limite générale de l'email,
+pas un bug du projet. Le texte reste **lisible** et l'email reste **fonctionnel**
+dans tous les cas. Décision : on laisse tel quel (impact marginal).
+
 ---
 
 ## 💬 Recueillir les avis après une séance
