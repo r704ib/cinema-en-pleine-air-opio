@@ -203,6 +203,33 @@ d'avis partiront automatiquement (par lots de 50/jour), avec une relance unique
 
 ---
 
+## 🚀 Améliorations à venir (idées notées)
+
+Idées validées comme faisables, à construire plus tard (à froid, après une
+séance) :
+
+### Contrôle des entrées par QR code
+
+Chaque réservation recevrait un **QR unique** dans son email de confirmation.
+Le soir, un bénévole muni d'un téléphone/tablette ouvrirait une **page de
+contrôle** (`controle.html`) qui scanne le QR et affiche en direct :
+« nom · nombre de places · valide », marque la personne comme **entrée**
+(anti double-scan), et signale les billets annulés ou inconnus.
+
+- **Coût :** quasi nul (mêmes outils Firebase, quotas gratuits).
+- **Points à trancher en conception :**
+  - 🔒 **Sécurité** : la page affiche des noms → protéger par un code d'accès
+    (PIN) ou une adresse secrète (pas publique).
+  - 📶 **Réseau** : en plein air le signal peut être faible → prévoir un repli
+    (recherche manuelle par nom, ou liste pré-chargée en début de soirée).
+  - 📱 **Sans QR** : certains arriveront sans email → recherche par nom/email
+    en secours sur la même page.
+
+> Statut : **idée notée, non commencée.** Demander à Claude de lancer une phase
+> de conception le moment venu.
+
+---
+
 ## 🔗 Liens et comptes utiles
 
 | Quoi | Lien | Compte |

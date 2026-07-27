@@ -3,3 +3,4 @@ cle-admin.json
 *.xlsx
 node_modules/
 *.png
+*.pdf
