@@ -100,6 +100,7 @@ Tout est dans **Firebase**. Chemin exact :
 
 | Champ | Signification |
 |---|---|
+| `eventId` | Séance concernée (ex. `opio-2026-08-18`) |
 | `prenom`, `nom` | Identité du réservant |
 | `email`, `telephone` | Contact |
 | `nb_adultes`, `nb_enfants_3_10`, `nb_enfants_moins_3` | Détail des places |
@@ -112,8 +113,10 @@ Tout est dans **Firebase**. Chemin exact :
 > 💡 Pas besoin d'ouvrir Firebase au quotidien : tu reçois **un email à chaque
 > réservation**. Firebase sert à voir la **liste complète** d'un coup d'œil.
 
-Il existe aussi une collection **`meta`** avec un document `gauge` = le
-**compteur de places**. N'y touche pas, sauf pour le remettre à 0 (voir plus bas).
+Le **compteur de places** de chaque séance est désormais le champ `reserved`
+directement dans le document de la séance concernée, collection **`events`**
+(chemin `events/<id-de-la-séance>`, ex. `events/opio-2026-08-18`) — **une
+jauge par séance**. N'y touche pas, sauf pour le remettre à 0 (voir plus bas).
 
 ---
 
@@ -141,12 +144,14 @@ Le site compte les visiteurs grâce à **Google Analytics** (dans Firebase).
 ## ✅ À faire avant d'ouvrir les réservations au public
 
 Pendant la mise en place, des réservations de **test** ont été créées. Avant le
-lancement réel, repartir d'une jauge propre :
+lancement réel, repartir d'une jauge propre — **pour chaque séance concernée**
+(chaque séance a sa propre jauge) :
 
 1. Firebase → Firestore → collection `reservations` → **supprimer les
-   réservations de test** (icône poubelle sur chaque document de test).
-2. Firebase → Firestore → collection `meta` → document `gauge` → mettre le champ
-   `reserved` à **`0`**.
+   réservations de test** de cette séance (icône poubelle sur chaque document
+   de test).
+2. Firebase → Firestore → collection `events` → **document de la séance
+   concernée** (ex. `opio-2026-08-18`) → mettre le champ `reserved` à **`0`**.
 
 > Tu peux me demander de te guider pas à pas le moment venu.
 
