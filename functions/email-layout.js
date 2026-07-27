@@ -28,12 +28,12 @@ function bouton(texte, url) {
 }
 
 function blocBillet(options) {
+  // Point d'extension futur : si un QR est fourni, on l'affiche ; sinon rien de visible
+  // (l'ancien encadré pointillé n'était qu'une indication interne, jamais destinée au visiteur).
   const zoneQr = options.qrDataUri
     ? '<div style="margin-top:18px; text-align:center;"><img src="' + options.qrDataUri +
       '" width="180" height="180" alt="QR code d\'entree" style="width:180px; height:180px;"></div>'
-    : '<div style="margin-top:18px; padding:16px; border:1px dashed #cbb892; border-radius:10px; ' +
-      'text-align:center; color:#9a8a6a; font-size:13px; font-style:italic;">' +
-      "&#9744;&nbsp; Emplacement réservé au futur QR code d'entrée</div>";
+    : "";
   return (
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:2px solid ' +
     C.or + '; border-radius:12px; background:#fff;"><tr><td style="padding:22px 26px;">' +

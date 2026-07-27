@@ -16,12 +16,12 @@ test("bouton contient le texte et l'url", () => {
   expect(html).toContain('href="https://exemple.fr/x"');
 });
 
-test("blocBillet sans qr affiche la mention futur QR et aucune image", () => {
+test("blocBillet sans qr n'affiche ni image ni mention interne", () => {
   const html = blocBillet({ reference: "ABC123", lignesHtml: "<strong>3 places</strong>" });
   expect(html).toContain("ABC123");
   expect(html).toContain("3 places");
-  expect(html).toContain("futur QR code");
   expect(html).not.toContain("<img");
+  expect(html).not.toContain("futur QR code");
 });
 
 test("blocBillet avec qr affiche une image et pas la mention pointillee", () => {
