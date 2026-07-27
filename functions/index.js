@@ -18,6 +18,7 @@ const {
   buildVisitorConfirmationEmail,
   buildOriaNewReservationEmail,
   buildOriaCancellationEmail,
+  buildVisitorCancellationEmail,
   buildFeedbackRequestEmail,
   buildFeedbackReminderEmail,
 } = require("./email-content");
@@ -216,8 +217,18 @@ exports.onReservationCancelled = onDocumentUpdated(
     const after = event.data.after.data();
     if (before.status === "active" && after.status === "cancelled") {
       const apiKey = BREVO_API_KEY.value();
-      await sendEmail(apiKey, buildOriaCancellationEmail(after));
-      logger.info("Cancellation email sent", { reservationId: event.params.reservationId });
+      const reservationId = event.params.reservationId;
+      try {
+        await sendEmail(apiKey, buildVisitorCancellationEmail(after, reservationId));
+      } catch (err) {
+        logger.error("Cancellation visitor email failed", { reservationId, error: String(err) });
+      }
+      try {
+        await sendEmail(apiKey, buildOriaCancellationEmail(after));
+      } catch (err) {
+        logger.error("Cancellation Oria email failed", { reservationId, error: String(err) });
+      }
+      logger.info("Cancellation emails processed", { reservationId });
     }
   }
 );

@@ -99,6 +99,28 @@ function buildOriaCancellationEmail(reservation) {
   };
 }
 
+function buildVisitorCancellationEmail(reservation, reservationId) {
+  const corps =
+    '<p style="font-size:17px; line-height:1.5; margin:0 0 14px;">Bonjour <strong>' +
+    reservation.prenom + "</strong>,</p>" +
+    '<p style="font-size:16px; line-height:1.6; color:#3b3152; margin:0 0 14px;">' +
+    "Votre annulation pour la séance du <strong>mardi 28 juillet 2026</strong> est bien prise " +
+    "en compte. Vos <strong>" + reservation.totalPlaces + " places</strong> ont été libérées — " +
+    "merci de nous avoir prévenus.</p>" +
+    '<p style="font-size:16px; line-height:1.6; color:#3b3152; margin:0 0 28px;">' +
+    "On espère vous retrouver à une prochaine projection sous les étoiles d'Opio&nbsp;!</p>" +
+    '<div style="text-align:center;">' + bouton("Voir les prochaines séances", SITE_URL) + "</div>";
+  return {
+    to: reservation.email,
+    subject: "Votre annulation — Cinéma en plein air d'Opio",
+    htmlContent: emailShell({
+      titre: "Annulation confirmée",
+      preheader: "Votre annulation est bien prise en compte.",
+      corpsHtml: corps,
+    }),
+  };
+}
+
 function buildFeedbackRequestEmail(reservation, reservationId) {
   const url = SITE_URL + "/avis.html?id=" + reservationId;
   return {
@@ -135,6 +157,7 @@ module.exports = {
   buildVisitorConfirmationEmail,
   buildOriaNewReservationEmail,
   buildOriaCancellationEmail,
+  buildVisitorCancellationEmail,
   buildFeedbackRequestEmail,
   buildFeedbackReminderEmail,
 };

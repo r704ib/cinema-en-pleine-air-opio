@@ -3,6 +3,7 @@ const {
   buildVisitorConfirmationEmail,
   buildOriaNewReservationEmail,
   buildOriaCancellationEmail,
+  buildVisitorCancellationEmail,
   buildFeedbackRequestEmail,
   buildFeedbackReminderEmail,
 } = require("../email-content");
@@ -47,6 +48,14 @@ test("buildOriaNewReservationEmail is addressed to Oria and lists quantities", (
 test("buildOriaCancellationEmail mentions the freed places", () => {
   const email = buildOriaCancellationEmail(sampleReservation);
   expect(email.htmlContent).toContain("Places libérées : 3");
+});
+
+test("buildVisitorCancellationEmail : destine au visiteur, mentionne les places liberees", () => {
+  const email = buildVisitorCancellationEmail(sampleReservation, "abc123");
+  expect(email.to).toBe("jean@example.com");
+  expect(email.htmlContent).toContain("Annulation");
+  expect(email.htmlContent).toContain("3 places");
+  expect(email.htmlContent).toContain("cinema-en-pleine-air-opio.oria-events.fr");
 });
 
 test("buildFeedbackRequestEmail targets the visitor and links to avis.html", () => {
