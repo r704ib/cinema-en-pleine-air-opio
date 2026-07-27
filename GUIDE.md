@@ -8,15 +8,19 @@ des mots simples.
 
 ## 📌 En une phrase
 
-Les visiteurs réservent leurs places sur le site, le nombre de places restantes
-se met à jour **en direct** pour tout le monde, ils reçoivent un email de
-confirmation, et **toi (Oria)** reçois un email à chaque réservation — le tout
-enregistré dans une base de données sécurisée.
+Le site est désormais **multi-séances** : une page d'accueil « Programme »
+liste les séances à venir et passées, et **chaque séance a sa propre page**
+avec sa jauge, son formulaire et ses emails à la bonne date. Les visiteurs
+réservent leurs places sur la page de la séance choisie, le nombre de places
+restantes se met à jour **en direct** pour tout le monde, ils reçoivent un
+email de confirmation, et **toi (Oria)** reçois un email à chaque réservation
+— le tout enregistré dans une base de données sécurisée.
 
 - **Adresse du site :** https://cinema-en-pleine-air-opio.oria-events.fr
-- **Événement :** projection « Un p'tit truc en plus » — **mardi 28 juillet 2026**
+- **Séances :** « Un p'tit truc en plus » — **mardi 28 juillet 2026** ·
+  « Jumanji : Bienvenue dans la jungle » — **mardi 18 août 2026**
 - **Horaires :** portes à **20h30** · film à **21h30** · fin ~**23h15**
-- **Jauge :** 150 places maximum · max 10 places par réservation
+- **Jauge :** 150 places maximum par séance · max 10 places par réservation
 - **Tarifs :** 5 € / adulte · 3 € / enfant 3-10 ans · gratuit moins de 3 ans
   (règlement **sur place**, aucun paiement en ligne)
 
@@ -154,6 +158,20 @@ Tu n'as **rien de technique à gérer**. Pour tout changement (texte, date, imag
 design…), il suffit de **me le demander** : je modifie le code puis je le
 déploie sur Firebase Hosting. Une **note de version** est créée à chaque fois
 dans le dossier `releases/` pour garder une trace de ce qui a changé.
+
+---
+
+## 🎬 Ajouter une nouvelle séance
+
+Là aussi, rien de technique à faire toi-même — il suffit de me demander
+d'ajouter la séance. Pour information, voici les 3 étapes que je réalise :
+
+1. **Créer sa fiche** dans la collection Firestore `events` (via script ou
+   console).
+2. **Dupliquer une page** `seance-AAAA-MM-JJ.html` existante, avec le bon
+   `EVENT_ID` et le contenu du nouveau film (titre, affiche, description).
+3. **Déployer le hosting.** La page d'accueil « Programme » affiche alors
+   automatiquement la nouvelle séance.
 
 ---
 
