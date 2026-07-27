@@ -554,6 +554,35 @@ footer{
   var app = initializeApp(firebaseConfig);
   var db = getFirestore(app);
 
+  // --- Consentement cookies + statistiques (Google Analytics) ---
+  (function () {
+    var KEY = 'cookie-consent-opio';
+    var banner = document.getElementById('cookie-banner');
+    function loadAnalytics() {
+      import("https://www.gstatic.com/firebasejs/10.13.0/firebase-analytics.js")
+        .then(function (m) { m.getAnalytics(app); })
+        .catch(function () {});
+    }
+    var choice = null;
+    try { choice = localStorage.getItem(KEY); } catch (e) {}
+    if (choice === 'accepted') {
+      loadAnalytics();
+    } else if (choice !== 'refused' && banner) {
+      requestAnimationFrame(function () { banner.classList.add('is-visible'); });
+      var accept = document.getElementById('cookie-accept');
+      var refuse = document.getElementById('cookie-refuse');
+      if (accept) accept.addEventListener('click', function () {
+        try { localStorage.setItem(KEY, 'accepted'); } catch (e) {}
+        banner.classList.remove('is-visible');
+        loadAnalytics();
+      });
+      if (refuse) refuse.addEventListener('click', function () {
+        try { localStorage.setItem(KEY, 'refused'); } catch (e) {}
+        banner.classList.remove('is-visible');
+      });
+    }
+  })();
+
   function carte(ev, passe) {
     var complet = (ev.reserved || 0) >= ev.gaugeMax;
     var ouvert = ev.ouvertResa === true && !complet;
@@ -593,46 +622,6 @@ footer{
 <script>
 (function(){
   "use strict";
-
-  /* ---------- Consentement cookies + statistiques (Google Analytics) ---------- */
-  var KEY = 'cookie-consent-opio';
-  var banner = document.getElementById('cookie-banner');
-  var firebaseConfig = {
-    apiKey: "AIzaSyBB-WiFkZfrHQD9rXDQ6KjbeNQyMlO4VbA",
-    authDomain: "cinema-en-pleine-air-opi-ac81e.firebaseapp.com",
-    projectId: "cinema-en-pleine-air-opi-ac81e",
-    storageBucket: "cinema-en-pleine-air-opi-ac81e.firebasestorage.app",
-    messagingSenderId: "245777069404",
-    appId: "1:245777069404:web:8478506b55ec08fb8abd99",
-    measurementId: "G-R66JNXKKPZ"
-  };
-  function loadAnalytics() {
-    Promise.all([
-      import("https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js"),
-      import("https://www.gstatic.com/firebasejs/10.13.0/firebase-analytics.js")
-    ]).then(function (mods) {
-      var app = mods[0].initializeApp(firebaseConfig);
-      mods[1].getAnalytics(app);
-    }).catch(function () {});
-  }
-  var choice = null;
-  try { choice = localStorage.getItem(KEY); } catch (e) {}
-  if (choice === 'accepted') {
-    loadAnalytics();
-  } else if (choice !== 'refused' && banner) {
-    requestAnimationFrame(function () { banner.classList.add('is-visible'); });
-    var accept = document.getElementById('cookie-accept');
-    var refuse = document.getElementById('cookie-refuse');
-    if (accept) accept.addEventListener('click', function () {
-      try { localStorage.setItem(KEY, 'accepted'); } catch (e) {}
-      banner.classList.remove('is-visible');
-      loadAnalytics();
-    });
-    if (refuse) refuse.addEventListener('click', function () {
-      try { localStorage.setItem(KEY, 'refused'); } catch (e) {}
-      banner.classList.remove('is-visible');
-    });
-  }
 
   /* ---------- Magnetic glow buttons ---------- */
   var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
