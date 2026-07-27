@@ -177,6 +177,59 @@ organisés directement par Oria, sans commune cliente.
 
 ---
 
+## 💬 Recueillir les avis après une séance
+
+Un système d'avis est en place pour recueillir les retours des participants.
+
+**Deux façons pour les gens de donner leur avis :**
+- **Par email** : un lien personnel leur est envoyé (ils sont reconnus
+  automatiquement).
+- **Par QR code sur place** : ils scannent l'affichette et saisissent leur
+  email ; le système retrouve leur nom. L'image du QR se génère avec
+  `outils-export/genere-qr.js` (fichier `qr-avis-opio.png` à imprimer).
+
+**Voir les avis :** lance `node export-avis.js` dans `outils-export/` → un
+fichier Excel `avis-….xlsx` est créé (note moyenne incluse).
+
+**⚠️ État actuel (Opio) :** l'**envoi automatique des emails d'avis est
+DÉSACTIVÉ** (`meta/session.feedbackEnabled = false`) — rien ne part tout seul.
+Le QR code, lui, reste utilisable sur place indépendamment.
+
+**Activer l'envoi automatique pour une prochaine séance :** mettre la date de la
+séance dans `meta/session.sessionDate` et passer `feedbackEnabled` à `true`
+(demande-moi, ou via la console Firebase). Le lendemain matin à 9h, les demandes
+d'avis partiront automatiquement (par lots de 50/jour), avec une relance unique
+3 jours après.
+
+---
+
+## 🚀 Améliorations à venir (idées notées)
+
+Idées validées comme faisables, à construire plus tard (à froid, après une
+séance) :
+
+### Contrôle des entrées par QR code
+
+Chaque réservation recevrait un **QR unique** dans son email de confirmation.
+Le soir, un bénévole muni d'un téléphone/tablette ouvrirait une **page de
+contrôle** (`controle.html`) qui scanne le QR et affiche en direct :
+« nom · nombre de places · valide », marque la personne comme **entrée**
+(anti double-scan), et signale les billets annulés ou inconnus.
+
+- **Coût :** quasi nul (mêmes outils Firebase, quotas gratuits).
+- **Points à trancher en conception :**
+  - 🔒 **Sécurité** : la page affiche des noms → protéger par un code d'accès
+    (PIN) ou une adresse secrète (pas publique).
+  - 📶 **Réseau** : en plein air le signal peut être faible → prévoir un repli
+    (recherche manuelle par nom, ou liste pré-chargée en début de soirée).
+  - 📱 **Sans QR** : certains arriveront sans email → recherche par nom/email
+    en secours sur la même page.
+
+> Statut : **idée notée, non commencée.** Demander à Claude de lancer une phase
+> de conception le moment venu.
+
+---
+
 ## 🔗 Liens et comptes utiles
 
 | Quoi | Lien | Compte |

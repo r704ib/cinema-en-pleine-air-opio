@@ -251,9 +251,9 @@ test("returns nothing when feedback is disabled", () => {
   expect(out).toEqual([]);
 });
 
-test("returns nothing before session day + 1", () => {
+test("returns nothing on the session day itself (même soir, trop tôt)", () => {
   const out = selectFeedbackRecipients(baseParams({
-    now: new Date(2026, 6, 28, 23, 0, 0), // même soir, trop tôt
+    now: new Date(2026, 6, 28, 23, 0, 0), // même soir que la séance
     reservations: [{ id: "1", status: "active", email: "a@b.fr", prenom: "A" }],
   }));
   expect(out).toEqual([]);
@@ -348,7 +348,11 @@ function selectFeedbackRecipients(params) {
 
   if (!feedbackEnabled) return [];
   if (typeof sessionDate !== "number" || typeof now !== "number") return [];
-  if (now < sessionDate + ONE_DAY_MS) return [];
+  // Envoi à partir du lendemain de la séance (comparaison par jour calendaire) :
+  // une séance en soirée + un envoi à 9h doivent partir le lendemain matin, pas J+2.
+  const nowDay = new Date(now); nowDay.setHours(0, 0, 0, 0);
+  const sessionDay = new Date(sessionDate); sessionDay.setHours(0, 0, 0, 0);
+  if (nowDay.getTime() <= sessionDay.getTime()) return [];
 
   const firstRequests = [];
   const reminders = [];

@@ -14,5 +14,16 @@ service cloud.firestore {
       allow list: if false;
       allow create, update, delete: if false;
     }
+
+    match /meta/session {
+      allow get: if true;
+      allow list: if false;
+      allow create, update, delete: if false;
+    }
+
+    match /avis/{avisId} {
+      allow get, list: if false;
+      allow create, update, delete: if false;
+    }
   }
 }

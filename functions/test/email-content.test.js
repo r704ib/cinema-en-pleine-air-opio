@@ -3,6 +3,8 @@ const {
   buildVisitorConfirmationEmail,
   buildOriaNewReservationEmail,
   buildOriaCancellationEmail,
+  buildFeedbackRequestEmail,
+  buildFeedbackReminderEmail,
 } = require("../email-content");
 
 const sampleReservation = {
@@ -39,4 +41,18 @@ test("buildOriaNewReservationEmail is addressed to Oria and lists quantities", (
 test("buildOriaCancellationEmail mentions the freed places", () => {
   const email = buildOriaCancellationEmail(sampleReservation);
   expect(email.htmlContent).toContain("Places libérées : 3");
+});
+
+test("buildFeedbackRequestEmail targets the visitor and links to avis.html", () => {
+  const email = buildFeedbackRequestEmail({ email: "jean@example.com", prenom: "Jean" }, "abc123");
+  expect(email.to).toBe("jean@example.com");
+  expect(email.htmlContent).toContain("Jean");
+  expect(email.htmlContent).toContain("/avis.html?id=abc123");
+});
+
+test("buildFeedbackReminderEmail includes the avis link and an opt-out link", () => {
+  const email = buildFeedbackReminderEmail({ email: "jean@example.com", prenom: "Jean" }, "abc123");
+  expect(email.to).toBe("jean@example.com");
+  expect(email.htmlContent).toContain("/avis.html?id=abc123");
+  expect(email.htmlContent).toContain("stop=1");
 });

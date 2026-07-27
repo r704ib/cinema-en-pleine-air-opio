@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Affiche avis — Cinéma en plein air d'Opio</title>
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --violet: #241A38;
+    --violet-clair: #4A3B66;
+    --or: #C98A2B;
+    --or-clair: #E8A33D;
+    --creme: #FBF7EF;
+    --creme-2: #F3EADA;
+  }
+
+  html, body { background: #ddd; }
+
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(201,138,43,.06), transparent 40%),
+      radial-gradient(circle at 82% 88%, rgba(201,138,43,.06), transparent 40%),
+      var(--creme);
+    color: var(--violet);
+    font-family: "Georgia", "Times New Roman", serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20mm 18mm;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* étoiles décoratives */
+  .star { position: absolute; color: var(--or); opacity: .35; }
+  .s1 { top: 26mm; left: 24mm; font-size: 14px; }
+  .s2 { top: 40mm; right: 30mm; font-size: 22px; opacity:.5; }
+  .s3 { top: 70mm; left: 30mm; font-size: 10px; }
+  .s4 { bottom: 60mm; right: 26mm; font-size: 16px; }
+  .s5 { bottom: 40mm; left: 34mm; font-size: 11px; opacity:.45; }
+
+  .kicker {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    letter-spacing: .35em;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: var(--or);
+    font-weight: 700;
+    margin-top: 4mm;
+  }
+
+  h1 {
+    font-size: 46px;
+    line-height: 1.08;
+    text-align: center;
+    font-weight: 700;
+    margin: 8mm 0 4mm;
+    font-style: italic;
+  }
+  h1 .em { color: var(--or); font-style: italic; }
+
+  .sub {
+    text-align: center;
+    font-size: 19px;
+    line-height: 1.5;
+    max-width: 150mm;
+    color: var(--violet);
+    margin-bottom: 2mm;
+  }
+
+  .film {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    text-align: center;
+    font-size: 14px;
+    letter-spacing: .06em;
+    color: var(--violet-clair);
+    margin-bottom: 8mm;
+  }
+
+  .qr-wrap {
+    background: #fff;
+    padding: 8mm;
+    border: 2px solid var(--or);
+    border-radius: 10px;
+    box-shadow: 0 6px 22px rgba(36,26,56,.12);
+    margin: 2mm 0 6mm;
+  }
+  .qr-wrap img { display: block; width: 78mm; height: 78mm; }
+
+  .scan {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-align: center;
+    color: var(--violet);
+    margin-bottom: 3mm;
+  }
+  .scan .arrow { color: var(--or); }
+
+  .steps {
+    display: flex;
+    gap: 6mm;
+    justify-content: center;
+    margin: 3mm 0 6mm;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+  }
+  .step { text-align: center; width: 42mm; }
+  .step .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--or); color: #fff; font-weight: 700; font-size: 15px;
+    margin-bottom: 3mm;
+  }
+  .step .txt { font-size: 13px; line-height: 1.4; color: var(--violet); }
+
+  .footer {
+    margin-top: auto;
+    text-align: center;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+  }
+  .footer .heart { font-size: 15px; color: var(--violet-clair); }
+  .footer .brand {
+    margin-top: 3mm;
+    font-size: 12px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--or);
+    font-weight: 700;
+  }
+  .rule { width: 40mm; height: 2px; background: var(--or); opacity:.5; margin: 5mm auto; border:0; }
+
+  @media print {
+    html, body { background: #fff; }
+    .page { box-shadow: none; margin: 0; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <span class="star s1">✦</span>
+    <span class="star s2">✧</span>
+    <span class="star s3">✦</span>
+    <span class="star s4">✧</span>
+    <span class="star s5">✦</span>
+
+    <div class="kicker">Cinéma en plein air · Opio</div>
+
+    <h1>Votre soirée vous a plu&nbsp;?<br><span class="em">Dites-nous tout</span></h1>
+
+    <p class="sub">
+      Votre avis nous aide à préparer des séances encore plus belles
+      sous les étoiles. Cela ne prend qu'une minute.
+    </p>
+    <p class="film">« Un p'tit truc en plus » — mardi 28 juillet 2026</p>
+
+    <div class="scan">Scannez ce QR code <span class="arrow">↓</span></div>
+
+    <div class="qr-wrap">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA4QAAAOECAYAAAD5Tv87AAAaG0lEQVR4AezBwa1YObIlwKPE84JrGkH/FzSCa9qhURcg/D+zLjZwJyPi1+8/AgAAQDsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJZ+8jFzrMBr5+6QzLHywrk7L8yx8iXn7pDMsfLCuTu8McfKl5y78yVzrLxw7g7JHCvw2rk7X1EBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABa+gn/OHeH75ljhWSOFb5njpUvOXeHN+ZYITl3h3fmWHnh3B2Sc3f4njlWuqsAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAt/YSn5lghOXeHZI6VF87deWGOFZJzd16YY+WFc3e+5NydF+ZY+bedu/PCuTsvzLFCMsfKC+fukMyx8sK5OyRzrJCcu8MbFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKWfAJ83x8oL5+68MMfKC+fuvDDHygvn7rwwxwrJuTvdnbvzwhwrJHOsfMm5OwD/rwoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANDST4DPO3fnhTlWvmSOlS+ZY+WFc3demGPlS+ZY+Ypzd16YY+WFc3demGOF5NydL5lj5YVzd4D3KgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEs/4alzd+C1OVZeOHfnS+ZYIZljheTcna+YY+WFc3e+5NydL5lj5YU5VuCvc3fgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANDST/jHHCvwVefuvDDHygvn7nzJuTsvzLHywrk7L8yx8sK5Oy/MsfJvO3eHZI6VF87deWGOlRfO3XlhjpUXzt15YY4VkjlW4IsqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABAS79+/xHgv2KOlRfO3XlhjpUvOXfnhTlWgP9x7g7vzLFCcu4O8F4FAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABo6ScfM8fKC+fuvDDHCt9z7s4L5+68MMfKC+fuvDDHCvx17s5XzLHywrk7L8yxwjtzrHzJuTskc6zwPefu8EYFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABo6Scfc+7OC3OsvHDuzgtzrJCcu/Mlc6y8cO4O75y788IcK19y7s4Lc6x8xbk7L8yxQjLHygvn7vDOHCsvnLvzwrk7L8yx8sK5Oy/MsfLCuTsvzLHywrk73VUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWfv3+IzwzxwrJuTsvzLHyJefufMkcKy+cu/Mlc6zwPefu/NvmWHnh3J0X5lh54dwdkjlWeOfcnRfmWHnh3J0X5lh54dydF+ZYITl35ysqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABAS79+/xEyxwrJuTsvzLHywrk7L8yxQnLuzpfMsfLCuTsvzLHyJefudDfHCu+cu8M7c6yQnLvzwhwrL5y788IcKy+cu/Mlc6y8cO7OV1QAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWfgL/BefuvDDHCsm5O/BVc6y8cO7OV5y78yVzrLwwxwrJuTsvnLvzJXOsvDDHygvn7rwwx8qXzLHCt1QAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWfv3+Izwzx8oL5+58yRwrL5y788IcKy+cu/PCHCtfcu7Ol8yx8sK5O18yx8oL5+58xRwrX3LuzpfMsfLCuTvw2hwrL5y7QzLHygvn7nRXAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWvoJ/5hj5UvmWHnh3J0vmWPlS+ZYeeHcHfhrjpUXzt35kjlW/m3n7rwwx8qXzLHywrk7L8yx8iXn7rwwx8qXnLtDMsfKl5y78yVzrLxw7s5XVAAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJZ+/f4jHzLHygvn7pDMsfLCuTtfMsfKl5y788IcK19y7s6XzLHywrk7L8yx8sK5O/Afc6y8cO7Ol8yx8iXn7rwwxwrvnLtDMsfKC+fufEUFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABo6Sf8Y44VvmeOFZI5Vl44d+eFOVZIzt15YY6VF87d+ZI5VuClOVaA/9scK3xLBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaOkn/OPcHd6ZY+WFc3e+ZI4V+Ko5Vl44d+eFc3f4ljlWXphj5UvO3fmSOVa+5NydF+ZYeeHcHd45d6e7CgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0NJP+KQ5VkjmWHnh3J0vOXfnhTlWXjh3h2SOlRfO3fmSOVa+4tydF+ZY+ZJzd144d4dkjpUvOXeH75ljhWSOlRfO3fmKCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFr6CU/NsfLCuTu8M8fKl8yxQjLHCu/MsfLCuTsvzLHyFefuvDDHygtzrLxw7g7fM8cKybk7X3LuDskcK91VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAln79/iNkjpUXzt35kjlWSM7dIZljheTcHZI5Vr7k3B3emGPlhXN3XphjhXfO3XlhjpUvOXfnhTlWSM7d4Y0KAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQ0k8+Zo6VF87dITl3B+D/B3Os8C1zrLxw7s4Lc6x8ybk7L8yx8sK5OyTn7rwwx8oL5+68MMfKC+fudFcBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABa+gn8L3Os8M65O19y7s4Lc6y8cO7Ol8yxwjvn7nQ3x8oL5+7wPXOskMyxAn/NsfLCuTtfUQEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFr69fuPfMgcK19y7s4Lc6x8ybk7vDPHygvn7pDMsQL/ce7Ol8yx8iXn7rwwx8oL5+68MMcK75y788IcK19y7g78RwUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGjpJx9z7g7vnLvzJXOsfMm5Oy+cu0Myx8qXnLvzwhwrX3LuDt9y7s4Lc6x8yRwrX3LuzgtzrLxw7s4Lc6y8cO7OC3OsfMkcK19y7k53FQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKWffMwcKy+cu/Ml5+58yRwrL5y78yVzrHzJuTu8M8fKl5y788IcK19x7s4Lc6x8yRwrX3LuzpfMscI75+68MMfKC+fufMm5O3xLBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaOknPDXHygvn7rwwx8qXzLHyJefuvDDHCrw2x8oL5+68MMfKv22OlRfO3YG/zt15YY6VF87deWGOlRfO3fmSOVb4nnN3vqICAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC09BM+aY4VknN3XphjhXfmWCE5d+eFOVZeOHfnS87d+bfNsfLCHCtfcu7OC3OsfMm5O7xz7g7vnLtDMsdKdxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKCln8D/cu7OC3OsvDDHCsm5Oy/MsfIl5+58yRwrJHOsvHDuTnfn7nzJuTsvzLHywhwrX3LuzgtzrMBfc6zwLRUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClX7//CPBfMcfKl5y788IcKy+cu/PCHCtfcu7OC3OsvHDuzgtzrHR37s6XzLHywrk7JHOsfMm5OyRzrHzJuTt8SwUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGjpJx8zxwq8du7OC+fuvDDHypecu/PCHCskc6zwxrk7L8yx8iVzrLxw7g7JHCsvnLvzwhwrXzLHygvn7nzJuTsvzLFCcu7OV1QAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWfsI/zt3he+ZY+ZI5Vl44d4fk3J0vmWOFd87d+bfNsUJy7g581bk7JHOsvHDuzgtzrPBGBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaOknPDXHCsm5O/DXHCsvnLvzwhwrL5y7wztzrHQ3x8qXnLvzwhwrJHOsfMkcK7xz7s4Lc6zwLRUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClnwCfN8fKl5y788IcK18yxwrJuTsvnLvDt8yx8sK5Oy/MsfIl5+58yRwrX3LuzgtzrLwwx8oL5+58yRwr3VUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWfgJ83rk7XzLHypecu8P3zLHybzt354U5VkjO3XlhjpUXzt15YY4VknN3SM7deWGOlRfmWOFbKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEs/4alzd+Cvc3demGPlhXN3Xjh350vmWPmSc3demGPlhXN3Xjh35yvO3XlhjpUvmWOF5NydF+ZYITl350vmWPmSc3e+ZI6V7ioAAAC0VAEAAKClCgAAAC1VAAAAaKkCAABASxUAAABaqgAAANBSBQAAgJYqAAAAtFQBAACgpQoAAAAtVQAAAGipAgAAQEsVAAAAWqoAAADQUgUAAICWKgAAALRUAQAAoKUKAAAALVUAAABoqQIAAEBLP+Efc6zAa3OsvHDuDu+cu/PCHCtfcu7OC3OsfMW5O19y7s4Lc6y8cO7OC3OsvDDHypecuwOvzbHCt1QAAABoqQIAAEBLFQAAAFqqAAAA0FIFAACAlioAAAC0VAEAAKClCgAAAC1VAAAA/qH0YQ0AAAExSURBVE97cEAAAAiAAMj8/7n6IcCkBgAAgEkNAAAAkxoAAAAmNQAAAExqAAAAmNQAAAAwqQEAAGBSAwAAwKQGAACASQ0AAACTGgAAACY1AAAATDr3CwAAAHMaAAAAJjUAAABMagAAAJjUAAAAMKkBAABgUgMAAMCkBgAAgEkNAAAAkxoAAAAmNQAAAExqAAAAmNQAAAAwqQEAAGBSAwAAwKQGAACASQ0AAACTGgAAACY1AAAATGoAAACY1AAAADCpAQAAYFIDAADApAYAAIBJDQAAAJMaAAAAJjUAAABMagAAAJjUAAAAMKkBAABgUgMAAMCkBgAAgEkNAAAAkxoAAAAmNQAAAExqAAAAmNQAAAAwqQEAAGBSAwAAwKQGAACASQ0AAACTGgAAACY1AAAATHpxY6DAwI+E8gAAAABJRU5ErkJggg==" alt="QR code vers le formulaire d'avis">
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <div class="txt">Ouvrez l'appareil photo de votre téléphone</div>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <div class="txt">Visez le QR code, touchez le lien</div>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <div class="txt">Indiquez votre email et donnez votre avis</div>
+      </div>
+    </div>
+
+    <hr class="rule">
+
+    <div class="footer">
+      <div class="heart">Merci d'être venu·e — à très vite sous les étoiles d'Opio ✦</div>
+      <div class="brand">Oria · Cinéma en plein air</div>
+    </div>
+  </div>
+</body>
+</html>

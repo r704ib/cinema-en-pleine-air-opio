@@ -1,0 +1,150 @@
+const {
+  validateFeedbackInput,
+  normalizeEmail,
+  MAX_FEEDBACK_TEXT_LENGTH,
+} = require("../feedback-logic");
+
+test("normalizeEmail trims and lowercases", () => {
+  expect(normalizeEmail("  Jean@Example.FR ")).toBe("jean@example.fr");
+  expect(normalizeEmail(null)).toBe("");
+});
+
+test("email mode: valid input keeps reservationId and cleans note/texts", () => {
+  const r = validateFeedbackInput({
+    mode: "email", reservationId: "abc123",
+    note: 4, commentaire: "  super soirée  ", film_souhaite: "Intouchables",
+    publication_autorisee: true,
+  });
+  expect(r.valid).toBe(true);
+  expect(r.feedback.mode).toBe("email");
+  expect(r.feedback.reservationId).toBe("abc123");
+  expect(r.feedback.email).toBeNull();
+  expect(r.feedback.note).toBe(4);
+  expect(r.feedback.commentaire).toBe("super soirée");
+  expect(r.feedback.publication_autorisee).toBe(true);
+});
+
+test("email mode: missing reservationId is rejected", () => {
+  const r = validateFeedbackInput({ mode: "email", note: 4 });
+  expect(r.valid).toBe(false);
+  expect(r.errors).toContain("reservationId");
+});
+
+test("qr mode: requires a valid email, normalized", () => {
+  const ok = validateFeedbackInput({ mode: "qr", email: "A@B.FR", note: 5 });
+  expect(ok.valid).toBe(true);
+  expect(ok.feedback.email).toBe("a@b.fr");
+  expect(ok.feedback.reservationId).toBeNull();
+
+  const bad = validateFeedbackInput({ mode: "qr", email: "not-an-email", note: 5 });
+  expect(bad.valid).toBe(false);
+  expect(bad.errors).toContain("email");
+});
+
+test("note must be an integer between 1 and 5", () => {
+  expect(validateFeedbackInput({ mode: "qr", email: "a@b.fr", note: 0 }).valid).toBe(false);
+  expect(validateFeedbackInput({ mode: "qr", email: "a@b.fr", note: 6 }).valid).toBe(false);
+  expect(validateFeedbackInput({ mode: "qr", email: "a@b.fr", note: 3.5 }).valid).toBe(false);
+});
+
+test("publication_autorisee defaults to false when not exactly true", () => {
+  const r = validateFeedbackInput({ mode: "qr", email: "a@b.fr", note: 3 });
+  expect(r.feedback.publication_autorisee).toBe(false);
+});
+
+test("a comment longer than the max is rejected", () => {
+  const long = "x".repeat(MAX_FEEDBACK_TEXT_LENGTH + 1);
+  const r = validateFeedbackInput({ mode: "qr", email: "a@b.fr", note: 3, commentaire: long });
+  expect(r.valid).toBe(false);
+  expect(r.errors).toContain("commentaire");
+});
+
+const { matchReservationByEmail, selectFeedbackRecipients } = require("../feedback-logic");
+
+test("matchReservationByEmail matches regardless of case/spaces", () => {
+  const reservations = [
+    { id: "1", email: "Alice@Example.FR" },
+    { id: "2", email: "bob@example.fr" },
+  ];
+  expect(matchReservationByEmail(reservations, " alice@example.fr ").id).toBe("1");
+  expect(matchReservationByEmail(reservations, "nobody@x.fr")).toBeNull();
+});
+
+function baseParams(overrides) {
+  const session = new Date(2026, 6, 28, 20, 30, 0); // 28/07/2026 20h30
+  return Object.assign(
+    {
+      reservations: [],
+      avisReservationIds: new Set(),
+      now: new Date(2026, 6, 29, 9, 0, 0), // J+1 à 9h (le lendemain matin)
+      sessionDate: session,
+      feedbackEnabled: true,
+    },
+    overrides || {}
+  );
+}
+
+test("returns nothing when feedback is disabled", () => {
+  const out = selectFeedbackRecipients(baseParams({ feedbackEnabled: false,
+    reservations: [{ id: "1", status: "active", email: "a@b.fr", prenom: "A" }] }));
+  expect(out).toEqual([]);
+});
+
+test("returns nothing before session day + 1", () => {
+  const out = selectFeedbackRecipients(baseParams({
+    now: new Date(2026, 6, 28, 23, 0, 0), // même soir, trop tôt
+    reservations: [{ id: "1", status: "active", email: "a@b.fr", prenom: "A" }],
+  }));
+  expect(out).toEqual([]);
+});
+
+test("first requests: only active, not opted-out, not already asked, no existing avis", () => {
+  const out = selectFeedbackRecipients(baseParams({
+    reservations: [
+      { id: "1", status: "active", email: "a@b.fr", prenom: "A" },
+      { id: "2", status: "cancelled", email: "c@b.fr", prenom: "C" },
+      { id: "3", status: "active", email: "d@b.fr", prenom: "D", avisOptOut: true },
+      { id: "4", status: "active", email: "e@b.fr", prenom: "E", avisRequestSent: true, avisRequestSentAt: new Date(2026, 6, 29, 8, 0, 0) },
+    ],
+    avisReservationIds: new Set(["1"]), // déjà un avis pour 1
+  }));
+  // seuls restent : aucun (1 a un avis, 2 annulé, 3 opt-out, 4 déjà sollicité récemment)
+  expect(out.map((r) => r.reservationId)).toEqual([]);
+});
+
+test("first request produced for a fresh active reservation", () => {
+  const out = selectFeedbackRecipients(baseParams({
+    reservations: [{ id: "9", status: "active", email: "z@b.fr", prenom: "Zoe" }],
+  }));
+  expect(out).toEqual([{ reservationId: "9", type: "request", email: "z@b.fr", prenom: "Zoe" }]);
+});
+
+test("reminder after 3 days for someone asked but without avis", () => {
+  const out = selectFeedbackRecipients(baseParams({
+    now: new Date(2026, 7, 1, 9, 0, 0), // 3 jours après avisRequestSentAt
+    reservations: [{
+      id: "7", status: "active", email: "g@b.fr", prenom: "G",
+      avisRequestSent: true, avisRequestSentAt: new Date(2026, 6, 29, 9, 0, 0),
+    }],
+  }));
+  expect(out).toEqual([{ reservationId: "7", type: "reminder", email: "g@b.fr", prenom: "G" }]);
+});
+
+test("no reminder if avisRelanceSent already true", () => {
+  const out = selectFeedbackRecipients(baseParams({
+    now: new Date(2026, 7, 1, 9, 0, 0),
+    reservations: [{
+      id: "7", status: "active", email: "g@b.fr", prenom: "G",
+      avisRequestSent: true, avisRequestSentAt: new Date(2026, 6, 29, 9, 0, 0), avisRelanceSent: true,
+    }],
+  }));
+  expect(out).toEqual([]);
+});
+
+test("caps the total at maxPerDay, first requests prioritized", () => {
+  const reservations = [];
+  for (let i = 0; i < 60; i++) reservations.push({ id: "r" + i, status: "active", email: i + "@b.fr", prenom: "P" + i });
+  const out = selectFeedbackRecipients(baseParams({ reservations: reservations, maxPerDay: 50 }));
+  expect(out.length).toBe(50);
+  expect(out.every((r) => r.type === "request")).toBe(true);
+});

@@ -97,7 +97,8 @@ Cloud Functions** (Admin SDK, immunisé aux règles client).
    `"0 9 * * *"`, `timeZone: "Europe/Paris"`, `secrets: [BREVO_API_KEY]`).
    - Lit `meta/session`. Si `feedbackEnabled !== true`, **ne fait rien** (état
      inerte — cas d'Opio).
-   - Si activé et que la date du jour est ≥ `sessionDate` + 1 jour :
+   - Si activé et que le jour calendaire courant est strictement postérieur au jour
+     de la séance (envoi dès **le lendemain matin**, pas J+2) :
      - Récupère **toutes** les réservations `status === "active"` (triées par
        `createdAt` ascendant), puis **filtre en mémoire** celles dont
        `avisRequestSent !== true`. (On évite la requête Firestore `!= true`, qui
