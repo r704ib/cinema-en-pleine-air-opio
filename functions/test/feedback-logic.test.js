@@ -84,6 +84,17 @@ function baseParams(overrides) {
   );
 }
 
+test("ne cible que les reservations de l'eventId fourni", () => {
+  const out = selectFeedbackRecipients(baseParams({
+    eventId: "opio-2026-07-28",
+    reservations: [
+      { id: "a", eventId: "opio-2026-07-28", status: "active", email: "a@b.fr", prenom: "A" },
+      { id: "b", eventId: "opio-2026-08-18", status: "active", email: "b@b.fr", prenom: "B" },
+    ],
+  }));
+  expect(out.map(function (r) { return r.reservationId; })).toEqual(["a"]);
+});
+
 test("returns nothing when feedback is disabled", () => {
   const out = selectFeedbackRecipients(baseParams({ feedbackEnabled: false,
     reservations: [{ id: "1", status: "active", email: "a@b.fr", prenom: "A" }] }));

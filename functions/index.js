@@ -291,6 +291,7 @@ exports.sendFeedbackRequests = onSchedule(
       const data = d.data();
       return {
         id: d.id,
+        eventId: data.eventId,
         status: data.status,
         email: data.email,
         prenom: data.prenom,
@@ -314,6 +315,7 @@ exports.sendFeedbackRequests = onSchedule(
       now: new Date(),
       sessionDate: session.sessionDate.toDate(),
       feedbackEnabled: true,
+      eventId: session.eventId || DEFAULT_EVENT_ID,
     });
 
     const apiKey = BREVO_API_KEY.value();

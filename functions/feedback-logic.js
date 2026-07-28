@@ -71,6 +71,7 @@ function selectFeedbackRecipients(params) {
   const now = toMillis(params.now);
   const sessionDate = toMillis(params.sessionDate);
   const feedbackEnabled = params.feedbackEnabled === true;
+  const eventId = params.eventId || null;
   const maxPerDay = params.maxPerDay || MAX_FEEDBACK_EMAILS_PER_DAY;
   const reminderDelayMs = (params.reminderDelayDays || FEEDBACK_REMINDER_DELAY_DAYS) * ONE_DAY_MS;
 
@@ -85,6 +86,7 @@ function selectFeedbackRecipients(params) {
 
   for (let i = 0; i < reservations.length; i++) {
     const r = reservations[i];
+    if (eventId && r.eventId !== eventId) continue;
     if (r.status !== "active") continue;
     if (r.avisOptOut === true) continue;
     if (avisReservationIds.has(r.id)) continue;
