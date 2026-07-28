@@ -21,6 +21,7 @@ const {
   buildVisitorCancellationEmail,
   buildFeedbackRequestEmail,
   buildFeedbackReminderEmail,
+  buildJourJReminderEmail,
 } = require("./email-content");
 
 admin.initializeApp();
@@ -104,6 +105,44 @@ exports.sendTestFeedbackEmail = onCall({ secrets: [BREVO_API_KEY] }, async () =>
   await sendEmail(apiKey, buildFeedbackRequestEmail(reservation, reservationId, refEvent, upcomingEvents));
   logger.info("Test feedback email sent");
   return { sent: true };
+});
+
+// Rappel « jour J » : envoie un rappel aux réservants actifs de la séance qui a
+// lieu AUJOURD'HUI (fuseau Europe/Paris). Idempotent : marque rappelJourJSent
+// par réservation, ne renvoie jamais deux fois. Déclenché à la demande.
+function parisDay(date) {
+  return date.toLocaleDateString("en-CA", { timeZone: "Europe/Paris" }); // "AAAA-MM-JJ"
+}
+exports.sendJourJReminder = onCall({ secrets: [BREVO_API_KEY] }, async () => {
+  const apiKey = BREVO_API_KEY.value();
+  const today = parisDay(new Date());
+  const eventsSnap = await db.collection("events").get();
+  let todayEvent = null;
+  eventsSnap.forEach(function (d) {
+    const e = Object.assign({ id: d.id }, d.data());
+    if (e.dateISO && parisDay(e.dateISO.toDate()) === today) todayEvent = e;
+  });
+  if (!todayEvent) {
+    logger.info("Rappel jour J : aucune séance aujourd'hui");
+    return { sent: 0, skipped: 0, event: null };
+  }
+  const resSnap = await db.collection("reservations").where("eventId", "==", todayEvent.id).get();
+  let sent = 0;
+  let skipped = 0;
+  for (const d of resSnap.docs) {
+    const r = d.data();
+    if (r.status !== "active") continue;
+    if (r.rappelJourJSent === true) { skipped++; continue; }
+    try {
+      await sendEmail(apiKey, buildJourJReminderEmail(r, todayEvent));
+      await d.ref.set({ rappelJourJSent: true, rappelJourJSentAt: FieldValue.serverTimestamp() }, { merge: true });
+      sent++;
+    } catch (err) {
+      logger.error("Rappel jour J échec", { reservationId: d.id, error: String(err) });
+    }
+  }
+  logger.info("Rappel jour J terminé", { event: todayEvent.id, sent: sent, skipped: skipped });
+  return { sent: sent, skipped: skipped, event: todayEvent.id };
 });
 
 exports.createReservation = onCall(async (request) => {

@@ -6,6 +6,7 @@ const {
   buildVisitorCancellationEmail,
   buildFeedbackRequestEmail,
   buildFeedbackReminderEmail,
+  buildJourJReminderEmail,
 } = require("../email-content");
 
 const sampleReservation = {
@@ -68,6 +69,15 @@ test("la confirmation utilise la date et le film de l'evenement", () => {
   expect(email.htmlContent).toContain("Mardi 18 août 2026");
   expect(email.htmlContent).toContain("Jumanji : Bienvenue dans la jungle");
   expect(email.htmlContent).not.toContain("28 juillet");
+});
+
+test("buildJourJReminderEmail : rappel du jour avec date, film et horaires", () => {
+  const email = buildJourJReminderEmail(sampleReservation, sampleEvent);
+  expect(email.to).toBe("jean@example.com");
+  expect(email.htmlContent).toContain("ce soir");
+  expect(email.htmlContent).toContain("Jumanji : Bienvenue dans la jungle");
+  expect(email.htmlContent).toContain("Mardi 18 août 2026");
+  expect(email.htmlContent).toContain("20h30");
 });
 
 test("buildOriaNewReservationEmail is addressed to Oria and lists quantities", () => {

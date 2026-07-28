@@ -204,6 +204,36 @@ function buildFeedbackReminderEmail(reservation, reservationId, event, upcomingE
   };
 }
 
+function buildJourJReminderEmail(reservation, event) {
+  const infos =
+    '<div style="font-size:12px; letter-spacing:2px; color:#C98A2B; font-weight:bold; text-transform:uppercase; margin-bottom:12px;">Infos pratiques</div>' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px; line-height:1.5; color:#3b3152;">' +
+    '<tr><td style="padding:6px 0; width:30px; vertical-align:top;">&#128197;</td><td style="padding:6px 0;"><strong>' +
+    event.dateLabel + "</strong> — portes <strong>" + event.portes + "</strong> · film <strong>" +
+    event.filmHeure + "</strong> · fin " + event.finHeure + "</td></tr>" +
+    '<tr><td style="padding:6px 0; vertical-align:top;">&#128205;</td><td style="padding:6px 0;">' + event.lieu + "</td></tr>" +
+    '<tr><td style="padding:6px 0; vertical-align:top;">&#128663;</td><td style="padding:6px 0;">Parking à proximité (Carrefour et Salle polyvalente)</td></tr>' +
+    '<tr><td style="padding:6px 0; vertical-align:top;">&#127871;</td><td style="padding:6px 0;">Buvette sur place · chaises fournies</td></tr>' +
+    '<tr><td style="padding:6px 0; vertical-align:top;">&#129509;</td><td style="padding:6px 0;">Pensez à prévoir de quoi vous couvrir pour la soirée</td></tr>' +
+    "</table>";
+  const corps =
+    '<p style="font-size:17px; line-height:1.5; margin:0 0 14px;">Bonjour <strong>' + reservation.prenom + "</strong>,</p>" +
+    '<p style="font-size:16px; line-height:1.6; color:#3b3152; margin:0 0 26px;">' +
+    "Petit rappel : votre séance de cinéma en plein air, c'est <strong>ce soir&nbsp;!</strong> " +
+    "On a hâte de vous accueillir sous les étoiles pour <strong>« " + event.filmTitre + " »</strong>.</p>" +
+    infos +
+    '<p style="font-size:16px; line-height:1.6; color:#3b3152; margin:26px 0 0;">À tout à l\'heure&nbsp;! 🌟</p>';
+  return {
+    to: reservation.email,
+    subject: "🎬 C'est ce soir ! Votre séance de cinéma à Opio",
+    htmlContent: emailShell({
+      titre: 'C\'est ce soir&nbsp;! <span style="color:#E8A33D;">&#127916;</span>',
+      preheader: "Votre séance de cinéma en plein air, c'est ce soir à Opio !",
+      corpsHtml: corps,
+    }),
+  };
+}
+
 module.exports = {
   buildCancelUrl,
   buildVisitorConfirmationEmail,
@@ -212,4 +242,5 @@ module.exports = {
   buildVisitorCancellationEmail,
   buildFeedbackRequestEmail,
   buildFeedbackReminderEmail,
+  buildJourJReminderEmail,
 };
