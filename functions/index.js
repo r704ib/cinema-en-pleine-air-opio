@@ -287,6 +287,15 @@ exports.sendFeedbackRequests = onSchedule(
       eventMap[d.id] = Object.assign({ id: d.id }, data);
     });
 
+    const nowMs = Date.now();
+    const upcomingEvents = Object.keys(eventMap)
+      .map(function (id) { return eventMap[id]; })
+      .filter(function (e) { return e.ouvertResa === true && e.dateISO && e.dateISO.toMillis() > nowMs; })
+      .sort(function (a, b) { return a.dateISO.toMillis() - b.dateISO.toMillis(); })
+      .map(function (e) {
+        return { filmTitre: e.filmTitre, dateLabel: e.dateLabel, lieu: e.lieu, afficheImg: e.afficheImg, slug: e.slug };
+      });
+
     const resSnap = await db.collection("reservations").get();
     const reservations = resSnap.docs.map(function (d) {
       const data = d.data();
@@ -327,13 +336,13 @@ exports.sendFeedbackRequests = onSchedule(
       const ev = eventMap[resEventById[rec.reservationId]] || eventMap[DEFAULT_EVENT_ID];
       try {
         if (rec.type === "request") {
-          await sendEmail(apiKey, buildFeedbackRequestEmail(reservation, rec.reservationId, ev));
+          await sendEmail(apiKey, buildFeedbackRequestEmail(reservation, rec.reservationId, ev, upcomingEvents));
           await db.collection("reservations").doc(rec.reservationId).set(
             { avisRequestSent: true, avisRequestSentAt: FieldValue.serverTimestamp() },
             { merge: true }
           );
         } else {
-          await sendEmail(apiKey, buildFeedbackReminderEmail(reservation, rec.reservationId, ev));
+          await sendEmail(apiKey, buildFeedbackReminderEmail(reservation, rec.reservationId, ev, upcomingEvents));
           await db.collection("reservations").doc(rec.reservationId).set(
             { avisRelanceSent: true, avisRelanceSentAt: FieldValue.serverTimestamp() },
             { merge: true }
