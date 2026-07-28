@@ -80,6 +80,32 @@ async function sendEmail(apiKey, email) {
   }
 }
 
+// Outil de test manuel — envoie l'email de demande d'avis (avec le bloc
+// "prochaines séances") à l'exploitant, pour vérifier le circuit. Destinataire
+// fixe (l'exploitant), donc sans risque. Déclenché à la demande via son URL.
+exports.sendTestFeedbackEmail = onCall({ secrets: [BREVO_API_KEY] }, async () => {
+  const apiKey = BREVO_API_KEY.value();
+  const eventsSnap = await db.collection("events").get();
+  const nowMs = Date.now();
+  const upcomingEvents = [];
+  let refEvent = null;
+  eventsSnap.forEach(function (d) {
+    const e = Object.assign({ id: d.id }, d.data());
+    if (d.id === DEFAULT_EVENT_ID) refEvent = e;
+    if (e.ouvertResa === true && e.dateISO && e.dateISO.toMillis() > nowMs) {
+      upcomingEvents.push({ filmTitre: e.filmTitre, dateLabel: e.dateLabel, lieu: e.lieu, afficheImg: e.afficheImg, slug: e.slug });
+    }
+  });
+  upcomingEvents.sort(function (a, b) { return 0; });
+  // Une réservation réelle du 28/07 pour que le lien "Donner mon avis" fonctionne.
+  const resSnap = await db.collection("reservations").where("eventId", "==", DEFAULT_EVENT_ID).limit(1).get();
+  const reservationId = resSnap.empty ? "TEST" : resSnap.docs[0].id;
+  const reservation = { email: "Oria.ei@outlook.fr", prenom: "Oria" };
+  await sendEmail(apiKey, buildFeedbackRequestEmail(reservation, reservationId, refEvent, upcomingEvents));
+  logger.info("Test feedback email sent");
+  return { sent: true };
+});
+
 exports.createReservation = onCall(async (request) => {
   const eventId = request.data && request.data.eventId;
   if (typeof eventId !== "string" || eventId.length === 0) {
