@@ -274,17 +274,18 @@ exports.onReservationCancelled = onDocumentUpdated(
 exports.sendFeedbackRequests = onSchedule(
   { schedule: "0 9 * * *", timeZone: "Europe/Paris", secrets: [BREVO_API_KEY] },
   async () => {
-    const sessionSnap = await db.collection("meta").doc("session").get();
-    if (!sessionSnap.exists) {
-      logger.info("Feedback: aucune session configurée, rien à faire");
-      return;
-    }
-    const session = sessionSnap.data();
-    if (session.feedbackEnabled !== true) {
-      logger.info("Feedback: envoi désactivé (feedbackEnabled != true)");
-      return;
-    }
-    const ev = await loadEvent(session.eventId || DEFAULT_EVENT_ID);
+    const eventsSnap = await db.collection("events").get();
+    const events = [];
+    const eventMap = {};
+    eventsSnap.forEach(function (d) {
+      const data = d.data();
+      events.push({
+        id: d.id,
+        sessionDate: data.dateISO ? data.dateISO.toDate() : null,
+        feedbackEnabled: data.feedbackEnabled,
+      });
+      eventMap[d.id] = Object.assign({ id: d.id }, data);
+    });
 
     const resSnap = await db.collection("reservations").get();
     const reservations = resSnap.docs.map(function (d) {
@@ -301,6 +302,8 @@ exports.sendFeedbackRequests = onSchedule(
         avisRequestSentAt: data.avisRequestSentAt ? data.avisRequestSentAt.toDate() : null,
       };
     });
+    const resEventById = {};
+    reservations.forEach(function (r) { resEventById[r.id] = r.eventId; });
 
     const avisSnap = await db.collection("avis").get();
     const avisReservationIds = new Set();
@@ -311,11 +314,9 @@ exports.sendFeedbackRequests = onSchedule(
 
     const recipients = selectFeedbackRecipients({
       reservations: reservations,
+      events: events,
       avisReservationIds: avisReservationIds,
       now: new Date(),
-      sessionDate: session.sessionDate.toDate(),
-      feedbackEnabled: true,
-      eventId: session.eventId || DEFAULT_EVENT_ID,
     });
 
     const apiKey = BREVO_API_KEY.value();
@@ -323,6 +324,7 @@ exports.sendFeedbackRequests = onSchedule(
     for (let i = 0; i < recipients.length; i++) {
       const rec = recipients[i];
       const reservation = { email: rec.email, prenom: rec.prenom };
+      const ev = eventMap[resEventById[rec.reservationId]] || eventMap[DEFAULT_EVENT_ID];
       try {
         if (rec.type === "request") {
           await sendEmail(apiKey, buildFeedbackRequestEmail(reservation, rec.reservationId, ev));
