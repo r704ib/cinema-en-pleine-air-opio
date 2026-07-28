@@ -30,5 +30,10 @@ service cloud.firestore {
       allow get, list: if false;
       allow create, update, delete: if false;
     }
+
+    match /avis_publics/{id} {
+      allow get, list: if true;
+      allow create, update, delete: if false;
+    }
   }
 }
