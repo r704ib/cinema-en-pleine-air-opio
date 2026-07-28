@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Administration — Avis</title>
+<style>
+  :root{--bg:#15101F;--surface:#241A38;--gold:#E8A33D;--ivory:#F6F1E7;--muted:#B8AFC9;--border:rgba(246,241,231,0.12);--green:#4ea36b;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ivory);font-family:Arial,Helvetica,sans-serif;line-height:1.5;padding:24px;}
+  h1{font-size:1.4rem;margin-bottom:6px;}
+  .sub{color:var(--muted);font-size:.9rem;margin-bottom:24px;}
+  .login{max-width:360px;margin:60px auto;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;}
+  .login h2{font-size:1.1rem;margin-bottom:16px;}
+  .login input{width:100%;padding:11px 12px;margin-bottom:12px;border-radius:8px;border:1px solid var(--border);background:#1c1530;color:var(--ivory);font-size:1rem;}
+  .login button,.btn{background:var(--gold);color:#2a1c05;border:0;border-radius:8px;padding:11px 18px;font-weight:bold;cursor:pointer;font-size:.95rem;}
+  .err{color:#e88;font-size:.88rem;margin-bottom:10px;min-height:1.1em;}
+  .topbar{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+  .topbar .spacer{flex:1;}
+  .logout{background:transparent;border:1px solid var(--border);color:var(--ivory);border-radius:8px;padding:8px 14px;cursor:pointer;}
+  table{width:100%;border-collapse:collapse;font-size:.9rem;}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+  th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;}
+  .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.78rem;}
+  .tag.ok{background:rgba(78,163,107,.2);color:#8fd6a8;}
+  .tag.no{background:rgba(232,120,120,.18);color:#e8a0a0;}
+  .tag.pub{background:rgba(232,163,61,.2);color:var(--gold);}
+  .act{padding:7px 12px;border-radius:8px;border:0;cursor:pointer;font-size:.85rem;font-weight:bold;}
+  .act.publish{background:var(--gold);color:#2a1c05;}
+  .act.publish:disabled{background:#4a4358;color:#8a8398;cursor:not-allowed;}
+  .act.unpublish{background:transparent;border:1px solid var(--border);color:var(--ivory);}
+  .stars{color:var(--gold);letter-spacing:1px;}
+  .muted{color:var(--muted);}
+  #content{display:none;}
+</style>
+</head>
+<body>
+  <div class="login" id="login">
+    <h2>Administration — Connexion</h2>
+    <div class="err" id="login-err"></div>
+    <input type="email" id="email" placeholder="Email" autocomplete="username">
+    <input type="password" id="password" placeholder="Mot de passe" autocomplete="current-password">
+    <button id="login-btn">Se connecter</button>
+  </div>
+
+  <div id="content">
+    <div class="topbar">
+      <div><h1>Modération des avis</h1><div class="sub" id="who"></div></div>
+      <span class="spacer"></span>
+      <button class="logout" id="logout">Déconnexion</button>
+    </div>
+    <div class="err" id="err"></div>
+    <table>
+      <thead><tr><th>Séance</th><th>Note</th><th>Commentaire</th><th>Personne</th><th>Consentement</th><th>État</th><th>Action</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p class="muted" id="empty" style="display:none;margin-top:20px;">Aucun avis reçu pour l'instant.</p>
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+  import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-functions.js";
+  var firebaseConfig = {
+    apiKey: "AIzaSyBB-WiFkZfrHQD9rXDQ6KjbeNQyMlO4VbA",
+    authDomain: "cinema-en-pleine-air-opi-ac81e.firebaseapp.com",
+    projectId: "cinema-en-pleine-air-opi-ac81e",
+    storageBucket: "cinema-en-pleine-air-opi-ac81e.firebasestorage.app",
+    messagingSenderId: "245777069404",
+    appId: "1:245777069404:web:8478506b55ec08fb8abd99",
+    measurementId: "G-R66JNXKKPZ"
+  };
+  var app = initializeApp(firebaseConfig);
+  var auth = getAuth(app);
+  var functions = getFunctions(app);
+  var listAvis = httpsCallable(functions, 'adminListAvis');
+  var publishAvis = httpsCallable(functions, 'adminPublishAvis');
+  var unpublishAvis = httpsCallable(functions, 'adminUnpublishAvis');
+
+  var loginEl=document.getElementById('login'), contentEl=document.getElementById('content');
+
+  document.getElementById('login-btn').addEventListener('click', function(){
+    document.getElementById('login-err').textContent='';
+    signInWithEmailAndPassword(auth, document.getElementById('email').value.trim(), document.getElementById('password').value)
+      .catch(function(){document.getElementById('login-err').textContent="Email ou mot de passe incorrect.";});
+  });
+  document.getElementById('logout').addEventListener('click', function(){signOut(auth);});
+
+  onAuthStateChanged(auth, function(user){
+    if(user){loginEl.style.display='none';contentEl.style.display='block';document.getElementById('who').textContent=user.email;charger();}
+    else{loginEl.style.display='block';contentEl.style.display='none';}
+  });
+
+  function esc(s){var d=document.createElement('div');d.textContent=s==null?'':String(s);return d.innerHTML;}
+  function stars(n){var s='';for(var i=1;i<=5;i++){s+=i<=n?'★':'☆';}return s;}
+
+  function charger(){
+    document.getElementById('err').textContent='';
+    listAvis().then(function(res){
+      var avis=(res.data&&res.data.avis)||[];
+      var rows=document.getElementById('rows'), empty=document.getElementById('empty');
+      document.getElementById('empty').style.display=avis.length?'none':'block';
+      rows.innerHTML=avis.map(function(a){
+        var consent=a.publication_autorisee?'<span class="tag ok">Oui</span>':'<span class="tag no">Non</span>';
+        var etat=a.publie?'<span class="tag pub">Publié</span>':'<span class="muted">—</span>';
+        var action=a.publie
+          ? '<button class="act unpublish" data-id="'+esc(a.id)+'" data-op="unpublish">Retirer</button>'
+          : '<button class="act publish" data-id="'+esc(a.id)+'" data-op="publish"'+(a.publication_autorisee?'':' disabled title="Pas de consentement"')+'>Publier</button>';
+        return '<tr><td>'+esc(a.seanceLabel||'—')+'</td><td class="stars">'+stars(a.note)+'</td>'+
+          '<td>'+esc(a.commentaire)+(a.film_souhaite?'<br><span class="muted">Film souhaité : '+esc(a.film_souhaite)+'</span>':'')+'</td>'+
+          '<td>'+esc(a.prenom)+' '+esc(a.nom)+'<br><span class="muted">'+esc(a.email)+'</span></td>'+
+          '<td>'+consent+'</td><td>'+etat+'</td><td>'+action+'</td></tr>';
+      }).join('');
+      Array.prototype.forEach.call(document.querySelectorAll('.act'), function(btn){
+        btn.addEventListener('click', function(){
+          var id=btn.getAttribute('data-id'), op=btn.getAttribute('data-op');
+          btn.disabled=true;btn.textContent='…';
+          var fn=op==='publish'?publishAvis:unpublishAvis;
+          fn({avisId:id}).then(function(){charger();}).catch(function(e){
+            document.getElementById('err').textContent="Action impossible : "+((e&&e.message)||'erreur');
+            charger();
+          });
+        });
+      });
+    }).catch(function(e){
+      document.getElementById('err').textContent="Chargement impossible : "+((e&&e.message)||'accès refusé');
+    });
+  }
+</script>
+</body>
+</html>
