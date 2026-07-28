@@ -3,6 +3,7 @@ const { validateReservationInput, MAX_PLACES, MAX_PER_RESERVATION } = require(".
 function validInput(overrides) {
   return Object.assign(
     {
+      eventId: "opio-2026-08-18",
       prenom: "Jean",
       nom: "Dupont",
       email: "jean@example.com",
@@ -58,4 +59,33 @@ test("a filled honeypot is rejected", () => {
   const result = validateReservationInput(validInput({ hp: "im-a-bot" }));
   expect(result.valid).toBe(false);
   expect(result.errors).toContain("hp");
+});
+
+test("rejette une reservation sans eventId", () => {
+  const res = validateReservationInput({
+    prenom: "A", nom: "B", email: "a@b.fr", telephone: "0600000000",
+    nb_adultes: 1, nb_enfants_3_10: 0, nb_enfants_moins_3: 0, hp: "",
+  }, 10);
+  expect(res.valid).toBe(false);
+  expect(res.errors).toContain("eventId");
+});
+
+test("inclut eventId dans la reservation validee", () => {
+  const res = validateReservationInput({
+    eventId: "opio-2026-08-18",
+    prenom: "A", nom: "B", email: "a@b.fr", telephone: "0600000000",
+    nb_adultes: 2, nb_enfants_3_10: 1, nb_enfants_moins_3: 0, hp: "",
+  }, 10);
+  expect(res.valid).toBe(true);
+  expect(res.reservation.eventId).toBe("opio-2026-08-18");
+});
+
+test("respecte le maxParReservation passe en argument", () => {
+  const base = {
+    eventId: "opio-2026-08-18",
+    prenom: "A", nom: "B", email: "a@b.fr", telephone: "0600000000",
+    nb_adultes: 4, nb_enfants_3_10: 0, nb_enfants_moins_3: 0, hp: "",
+  };
+  expect(validateReservationInput(base, 3).valid).toBe(false); // 4 > 3
+  expect(validateReservationInput(base, 5).valid).toBe(true);  // 4 <= 5
 });

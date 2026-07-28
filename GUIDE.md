@@ -8,15 +8,19 @@ des mots simples.
 
 ## 📌 En une phrase
 
-Les visiteurs réservent leurs places sur le site, le nombre de places restantes
-se met à jour **en direct** pour tout le monde, ils reçoivent un email de
-confirmation, et **toi (Oria)** reçois un email à chaque réservation — le tout
-enregistré dans une base de données sécurisée.
+Le site est désormais **multi-séances** : une page d'accueil « Programme »
+liste les séances à venir et passées, et **chaque séance a sa propre page**
+avec sa jauge, son formulaire et ses emails à la bonne date. Les visiteurs
+réservent leurs places sur la page de la séance choisie, le nombre de places
+restantes se met à jour **en direct** pour tout le monde, ils reçoivent un
+email de confirmation, et **toi (Oria)** reçois un email à chaque réservation
+— le tout enregistré dans une base de données sécurisée.
 
 - **Adresse du site :** https://cinema-en-pleine-air-opio.oria-events.fr
-- **Événement :** projection « Un p'tit truc en plus » — **mardi 28 juillet 2026**
+- **Séances :** « Un p'tit truc en plus » — **mardi 28 juillet 2026** ·
+  « Jumanji : Bienvenue dans la jungle » — **mardi 18 août 2026**
 - **Horaires :** portes à **20h30** · film à **21h30** · fin ~**23h15**
-- **Jauge :** 150 places maximum · max 10 places par réservation
+- **Jauge :** 150 places maximum par séance · max 10 places par réservation
 - **Tarifs :** 5 € / adulte · 3 € / enfant 3-10 ans · gratuit moins de 3 ans
   (règlement **sur place**, aucun paiement en ligne)
 
@@ -96,6 +100,7 @@ Tout est dans **Firebase**. Chemin exact :
 
 | Champ | Signification |
 |---|---|
+| `eventId` | Séance concernée (ex. `opio-2026-08-18`) |
 | `prenom`, `nom` | Identité du réservant |
 | `email`, `telephone` | Contact |
 | `nb_adultes`, `nb_enfants_3_10`, `nb_enfants_moins_3` | Détail des places |
@@ -108,8 +113,10 @@ Tout est dans **Firebase**. Chemin exact :
 > 💡 Pas besoin d'ouvrir Firebase au quotidien : tu reçois **un email à chaque
 > réservation**. Firebase sert à voir la **liste complète** d'un coup d'œil.
 
-Il existe aussi une collection **`meta`** avec un document `gauge` = le
-**compteur de places**. N'y touche pas, sauf pour le remettre à 0 (voir plus bas).
+Le **compteur de places** de chaque séance est désormais le champ `reserved`
+directement dans le document de la séance concernée, collection **`events`**
+(chemin `events/<id-de-la-séance>`, ex. `events/opio-2026-08-18`) — **une
+jauge par séance**. N'y touche pas, sauf pour le remettre à 0 (voir plus bas).
 
 ---
 
@@ -137,12 +144,14 @@ Le site compte les visiteurs grâce à **Google Analytics** (dans Firebase).
 ## ✅ À faire avant d'ouvrir les réservations au public
 
 Pendant la mise en place, des réservations de **test** ont été créées. Avant le
-lancement réel, repartir d'une jauge propre :
+lancement réel, repartir d'une jauge propre — **pour chaque séance concernée**
+(chaque séance a sa propre jauge) :
 
 1. Firebase → Firestore → collection `reservations` → **supprimer les
-   réservations de test** (icône poubelle sur chaque document de test).
-2. Firebase → Firestore → collection `meta` → document `gauge` → mettre le champ
-   `reserved` à **`0`**.
+   réservations de test** de cette séance (icône poubelle sur chaque document
+   de test).
+2. Firebase → Firestore → collection `events` → **document de la séance
+   concernée** (ex. `opio-2026-08-18`) → mettre le champ `reserved` à **`0`**.
 
 > Tu peux me demander de te guider pas à pas le moment venu.
 
@@ -154,6 +163,20 @@ Tu n'as **rien de technique à gérer**. Pour tout changement (texte, date, imag
 design…), il suffit de **me le demander** : je modifie le code puis je le
 déploie sur Firebase Hosting. Une **note de version** est créée à chaque fois
 dans le dossier `releases/` pour garder une trace de ce qui a changé.
+
+---
+
+## 🎬 Ajouter une nouvelle séance
+
+Là aussi, rien de technique à faire toi-même — il suffit de me demander
+d'ajouter la séance. Pour information, voici les 3 étapes que je réalise :
+
+1. **Créer sa fiche** dans la collection Firestore `events` (via script ou
+   console).
+2. **Dupliquer une page** `seance-AAAA-MM-JJ.html` existante, avec le bon
+   `EVENT_ID` et le contenu du nouveau film (titre, affiche, description).
+3. **Déployer le hosting.** La page d'accueil « Programme » affiche alors
+   automatiquement la nouvelle séance.
 
 ---
 
@@ -216,6 +239,54 @@ séance dans `meta/session.sessionDate` et passer `feedbackEnabled` à `true`
 (demande-moi, ou via la console Firebase). Le lendemain matin à 9h, les demandes
 d'avis partiront automatiquement (par lots de 50/jour), avec une relance unique
 3 jours après.
+
+---
+
+## 💬 Publier et modérer les avis
+
+Les avis reçus ne s'affichent pas automatiquement sur le site : ils passent
+d'abord par une étape de **modération**, pour garder le contrôle sur ce qui est
+publié.
+
+- **Page publique `avis-publics.html`** (lien **« Avis »** dans le menu du
+  site) : affiche les avis que tu as choisi de publier — étoiles, commentaire,
+  et « Prénom I. — séance du … ».
+- **Écran d'administration `admin.html`** : c'est là que tu vois tous les avis
+  reçus et que tu décides de les **publier** ou de les **retirer**. Son adresse
+  n'apparaît nulle part dans le menu du site — **garde-la pour toi** (elle
+  ressemble à `https://cinema-en-pleine-air-opio.oria-events.fr/admin.html`) —
+  et elle est de toute façon **protégée par une connexion** (email + mot de
+  passe).
+
+### 🔑 Mise en place du compte admin (une seule fois)
+
+Avant de pouvoir te connecter à `admin.html`, il faut créer ton compte :
+
+1. Aller sur **https://console.firebase.google.com**, ouvrir le projet
+   **« Cinema-en-pleine-air-Opio »**.
+2. Menu de gauche → **« Authentication »**.
+3. Onglet **« Sign-in method »** → activer le fournisseur **« Email/Mot de
+   passe »**.
+4. Onglet **« Users »** → **« Add user »** → renseigner ton email (celui de
+   l'exploitant) et un mot de passe de ton choix.
+
+Une fois ce compte créé, tu peux te connecter sur `admin.html` avec cet email
+et ce mot de passe.
+
+### ✅ Ce qui rend un avis public
+
+Un avis n'apparaît sur la page publique que si **les deux conditions** sont
+réunies :
+
+1. La personne a **coché la case de consentement** en déposant son avis.
+2. Toi, depuis `admin.html`, tu as cliqué sur **« Publier »** pour cet avis.
+
+Sans consentement, le bouton « Publier » reste bloqué, même si tu le souhaites.
+Tu peux à tout moment **retirer** un avis déjà publié.
+
+**Confidentialité :** la page publique ne montre jamais l'email ni le nom
+complet de la personne — uniquement ses **initiales** (prénom + première
+lettre du nom, ex. « Julie D. »).
 
 ---
 

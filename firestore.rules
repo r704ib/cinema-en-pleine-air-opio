@@ -21,8 +21,18 @@ service cloud.firestore {
       allow create, update, delete: if false;
     }
 
+    match /events/{eventId} {
+      allow get, list: if true;
+      allow create, update, delete: if false;
+    }
+
     match /avis/{avisId} {
       allow get, list: if false;
+      allow create, update, delete: if false;
+    }
+
+    match /avis_publics/{id} {
+      allow get, list: if true;
       allow create, update, delete: if false;
     }
   }

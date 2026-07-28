@@ -5,10 +5,12 @@ const MAX_PER_RESERVATION = 10;
 const PRICE_ADULTE = 5;
 const PRICE_ENFANT = 3;
 
-function validateReservationInput(data) {
+function validateReservationInput(data, maxParReservation) {
   data = data || {};
+  const maxPar = Number.isInteger(maxParReservation) ? maxParReservation : MAX_PER_RESERVATION;
   const errors = [];
 
+  if (typeof data.eventId !== "string" || data.eventId.trim().length === 0) errors.push("eventId");
   if (typeof data.prenom !== "string" || data.prenom.trim().length === 0) errors.push("prenom");
   if (typeof data.nom !== "string" || data.nom.trim().length === 0) errors.push("nom");
   if (typeof data.email !== "string" || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) errors.push("email");
@@ -23,7 +25,7 @@ function validateReservationInput(data) {
   if (!Number.isInteger(nbEnfantsMoins3) || nbEnfantsMoins3 < 0) errors.push("nb_enfants_moins_3");
 
   const totalPlaces = nbAdultes + nbEnfants310 + nbEnfantsMoins3;
-  if (!Number.isInteger(totalPlaces) || totalPlaces < 1 || totalPlaces > MAX_PER_RESERVATION) {
+  if (!Number.isInteger(totalPlaces) || totalPlaces < 1 || totalPlaces > maxPar) {
     errors.push("totalPlaces");
   }
 
@@ -36,6 +38,7 @@ function validateReservationInput(data) {
   return {
     valid: true,
     reservation: {
+      eventId: data.eventId.trim(),
       prenom: data.prenom.trim(),
       nom: data.nom.trim(),
       email: data.email.trim(),

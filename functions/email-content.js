@@ -25,19 +25,21 @@ function detailPlaces(r) {
   return parts.join(", ");
 }
 
-const INFOS_PRATIQUES = [
-  { picto: "&#128205;", texteHtml: "Cœur du village, <strong>Opio 06650</strong>" },
-  { picto: "&#128368;", texteHtml: "Portes <strong>20h30</strong> · Film <strong>21h30</strong> · Fin ~23h15" },
-  { picto: "&#128663;", texteHtml: "Parking à proximité (Carrefour et Salle polyvalente)" },
-  { picto: "&#127871;", texteHtml: "Buvette sur place · chaises fournies" },
-  { picto: "&#129509;", texteHtml: "Prévoyez de quoi vous couvrir si les températures baissent" },
-];
+function infosPratiques(event) {
+  return [
+    { picto: "&#128205;", texteHtml: "<strong>" + event.lieu + "</strong>" },
+    { picto: "&#128368;", texteHtml: "Portes <strong>" + event.portes + "</strong> · Film <strong>" + event.filmHeure + "</strong> · Fin " + event.finHeure },
+    { picto: "&#128663;", texteHtml: "Parking à proximité (Carrefour et Salle polyvalente)" },
+    { picto: "&#127871;", texteHtml: "Buvette sur place · chaises fournies" },
+    { picto: "&#129509;", texteHtml: "Prévoyez de quoi vous couvrir si les températures baissent" },
+  ];
+}
 
 function buildCancelUrl(reservationId) {
   return SITE_URL + "/annuler.html?id=" + reservationId;
 }
 
-function buildVisitorConfirmationEmail(reservation, reservationId) {
+function buildVisitorConfirmationEmail(reservation, reservationId, event) {
   const cancelUrl = buildCancelUrl(reservationId);
   const billet = blocBillet({
     reference: referenceDepuisId(reservationId),
@@ -49,11 +51,11 @@ function buildVisitorConfirmationEmail(reservation, reservationId) {
     '<p style="font-size:17px; line-height:1.5; margin:0 0 14px;">Bonjour <strong>' +
     reservation.prenom + "</strong>,</p>" +
     '<p style="font-size:16px; line-height:1.6; color:#3b3152; margin:0 0 26px;">' +
-    "Votre réservation pour la projection de <strong>« Un p'tit truc en plus »</strong> le " +
-    "<strong>mardi 28 juillet 2026</strong> est bien confirmée. On a hâte de vous accueillir " +
+    "Votre réservation pour la projection de <strong>« " + event.filmTitre + " »</strong> le " +
+    "<strong>" + event.dateLabel + "</strong> est bien confirmée. On a hâte de vous accueillir " +
     "sous les étoiles d'Opio&nbsp;!</p>" +
     billet +
-    '<div style="margin:30px 0 6px;">' + blocInfos(INFOS_PRATIQUES) + "</div>" +
+    '<div style="margin:30px 0 6px;">' + blocInfos(infosPratiques(event)) + "</div>" +
     '<p style="font-size:15px; color:#3b3152; margin:26px 0 16px; text-align:center;">' +
     "Un empêchement&nbsp;? Merci de libérer votre place pour d'autres spectateurs.</p>" +
     '<div style="text-align:center;">' + bouton("Annuler ma réservation", cancelUrl) + "</div>";
@@ -68,13 +70,20 @@ function buildVisitorConfirmationEmail(reservation, reservationId) {
   };
 }
 
-function buildOriaNewReservationEmail(reservation) {
+function seanceLabel(reservation, event) {
+  if (event && event.dateLabel) return event.dateLabel;
+  return reservation.eventId || "séance";
+}
+
+function buildOriaNewReservationEmail(reservation, event) {
+  const seance = seanceLabel(reservation, event);
   return {
     to: ORIA_EMAIL,
-    subject: "Nouvelle réservation : " + reservation.prenom + " " + reservation.nom,
+    subject: "Nouvelle réservation — " + seance + " — " + reservation.prenom + " " + reservation.nom,
     htmlContent:
       "<p>Nouvelle réservation reçue.</p>" +
       "<ul>" +
+      "<li><strong>Séance : " + seance + "</strong></li>" +
       "<li>Nom : " + reservation.prenom + " " + reservation.nom + "</li>" +
       "<li>Email : " + reservation.email + "</li>" +
       "<li>Téléphone : " + reservation.telephone + "</li>" +
@@ -86,25 +95,27 @@ function buildOriaNewReservationEmail(reservation) {
   };
 }
 
-function buildOriaCancellationEmail(reservation) {
+function buildOriaCancellationEmail(reservation, event) {
+  const seance = seanceLabel(reservation, event);
   return {
     to: ORIA_EMAIL,
-    subject: "Annulation : " + reservation.prenom + " " + reservation.nom,
+    subject: "Annulation — " + seance + " — " + reservation.prenom + " " + reservation.nom,
     htmlContent:
       "<p>Une réservation vient d'être annulée.</p>" +
       "<ul>" +
+      "<li><strong>Séance : " + seance + "</strong></li>" +
       "<li>Nom : " + reservation.prenom + " " + reservation.nom + "</li>" +
       "<li>Places libérées : " + reservation.totalPlaces + "</li>" +
       "</ul>",
   };
 }
 
-function buildVisitorCancellationEmail(reservation, reservationId) {
+function buildVisitorCancellationEmail(reservation, reservationId, event) {
   const corps =
     '<p style="font-size:17px; line-height:1.5; margin:0 0 14px;">Bonjour <strong>' +
     reservation.prenom + "</strong>,</p>" +
     '<p style="font-size:16px; line-height:1.6; color:#3b3152; margin:0 0 14px;">' +
-    "Votre annulation pour la séance du <strong>mardi 28 juillet 2026</strong> est bien prise " +
+    "Votre annulation pour la séance du <strong>" + event.dateLabel + "</strong> est bien prise " +
     "en compte. Vos <strong>" + reservation.totalPlaces + (reservation.totalPlaces > 1 ? " places" : " place") + "</strong> ont été libérées — " +
     "merci de nous avoir prévenus.</p>" +
     '<p style="font-size:16px; line-height:1.6; color:#3b3152; margin:0 0 28px;">' +
@@ -121,7 +132,7 @@ function buildVisitorCancellationEmail(reservation, reservationId) {
   };
 }
 
-function buildFeedbackRequestEmail(reservation, reservationId) {
+function buildFeedbackRequestEmail(reservation, reservationId, event) {
   const url = SITE_URL + "/avis.html?id=" + reservationId;
   const corps =
     '<p style="font-size:17px; line-height:1.5; margin:0 0 14px;">Bonjour <strong>' +
@@ -141,7 +152,7 @@ function buildFeedbackRequestEmail(reservation, reservationId) {
   };
 }
 
-function buildFeedbackReminderEmail(reservation, reservationId) {
+function buildFeedbackReminderEmail(reservation, reservationId, event) {
   const url = SITE_URL + "/avis.html?id=" + reservationId;
   const stopUrl = url + "&stop=1";
   const corps =

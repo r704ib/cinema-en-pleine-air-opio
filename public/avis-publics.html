@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avis — Cinéma en plein air d'Opio</title>
+<meta name="description" content="Les avis des spectateurs du Cinéma en plein air d'Opio.">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,ital@9..144,300..700,0..1&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--c-bg:#15101F;--c-surface:#241A38;--c-surface-2:#1c1530;--c-gold:#E8A33D;
+    --c-gold-soft:rgba(232,163,61,0.16);--c-lavender:#9B86C9;--c-ivory:#F6F1E7;
+    --c-muted:#B8AFC9;--c-border:rgba(246,241,231,0.1);--font-display:'Fraunces',serif;--font-body:'Outfit',sans-serif;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--c-bg);color:var(--c-ivory);font-family:var(--font-body);line-height:1.6;
+    background-image:radial-gradient(circle at 20% 0%,rgba(155,134,201,.10),transparent 45%),radial-gradient(circle at 85% 90%,rgba(232,163,61,.08),transparent 45%);}
+  .site-nav{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;padding:16px 28px;backdrop-filter:blur(12px);background:rgba(21,16,31,.6);border-bottom:1px solid var(--c-border);}
+  .brand{font-family:var(--font-display);font-size:1.15rem;color:var(--c-ivory);text-decoration:none;font-weight:600;}
+  .brand span{color:var(--c-gold);font-style:italic;}
+  .spacer{flex:1;}
+  .btn{display:inline-flex;align-items:center;padding:11px 22px;border-radius:999px;background:linear-gradient(135deg,#F4C26B,var(--c-gold));color:#2a1c05;font-weight:600;text-decoration:none;font-size:.88rem;border:0;}
+  .btn.btn-ghost{background:transparent;color:var(--c-ivory);border:1px solid var(--c-border);}
+  .btn.btn-ghost.active{color:var(--c-gold);border-color:var(--c-gold);}
+  .hero{max-width:900px;margin:0 auto;padding:70px 24px 34px;text-align:center;}
+  .eyebrow{letter-spacing:.32em;text-transform:uppercase;font-size:.72rem;color:var(--c-gold);font-weight:600;margin-bottom:18px;}
+  h1{font-family:var(--font-display);font-size:clamp(2.3rem,6vw,3.6rem);font-weight:600;line-height:1.05;font-style:italic;}
+  .hero>p{color:var(--c-muted);max-width:560px;margin:18px auto 0;font-size:1.05rem;}
+  .stat{display:none;align-items:center;gap:14px;margin-top:30px;padding:14px 26px;border:1px solid var(--c-border);border-radius:16px;background:var(--c-surface);}
+  .stat .score{font-family:var(--font-display);font-size:2rem;color:var(--c-gold);line-height:1;}
+  .stat .score small{font-size:1rem;color:var(--c-muted);}
+  .stat .stars{font-size:1.05rem;letter-spacing:2px;color:var(--c-gold);}
+  .stat .count{color:var(--c-muted);font-size:.9rem;}
+  .wrap{max-width:1080px;margin:0 auto;padding:20px 24px 90px;}
+  .grid{display:grid;gap:22px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));}
+  .card{border:1px solid var(--c-border);border-radius:20px;background:linear-gradient(180deg,var(--c-surface),var(--c-surface-2));padding:26px 26px 22px;display:flex;flex-direction:column;position:relative;overflow:hidden;}
+  .card::before{content:"\201C";position:absolute;top:-18px;right:14px;font-family:var(--font-display);font-size:6rem;color:var(--c-gold-soft);line-height:1;}
+  .stars{color:var(--c-gold);letter-spacing:3px;font-size:1.05rem;margin-bottom:14px;}
+  .stars .empty{color:rgba(232,163,61,.28);}
+  .comment{font-size:1.02rem;color:var(--c-ivory);flex:1;white-space:pre-wrap;}
+  .meta{margin-top:20px;padding-top:16px;border-top:1px solid var(--c-border);display:flex;align-items:center;gap:12px;}
+  .avatar{width:38px;height:38px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:var(--c-gold-soft);color:var(--c-gold);font-weight:600;font-family:var(--font-display);}
+  .who{font-weight:600;color:var(--c-ivory);font-size:.96rem;}
+  .seance{color:var(--c-lavender);font-size:.82rem;}
+  .empty-state{margin-top:20px;border:1px dashed var(--c-border);border-radius:20px;padding:60px 24px;text-align:center;background:var(--c-surface);}
+  .empty-state .ico{font-size:2.4rem;margin-bottom:14px;color:var(--c-gold);}
+  .empty-state h3{font-family:var(--font-display);font-style:italic;font-size:1.5rem;font-weight:500;margin-bottom:8px;}
+  .empty-state p{color:var(--c-muted);max-width:420px;margin:0 auto;}
+  .cookie-banner{position:fixed;left:16px;right:16px;bottom:16px;max-width:560px;margin:0 auto;background:var(--c-surface);border:1px solid var(--c-border);border-radius:16px;padding:18px 20px;display:none;z-index:50;}
+  .cookie-banner.is-visible{display:block;}
+  .cookie-banner p{color:var(--c-muted);font-size:.9rem;margin-bottom:12px;}
+  .cookie-banner .row{display:flex;gap:10px;justify-content:flex-end;}
+  .cookie-banner button{padding:9px 16px;border-radius:999px;border:1px solid var(--c-border);background:transparent;color:var(--c-ivory);cursor:pointer;font-family:inherit;font-size:.85rem;}
+  .cookie-banner button.accept{background:var(--c-gold);color:#2a1c05;border:0;font-weight:600;}
+  footer{text-align:center;color:var(--c-muted);font-size:.82rem;padding:30px 24px 40px;border-top:1px solid var(--c-border);}
+</style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/" class="brand">Cinéma <span>Plein Air</span></a>
+    <span class="spacer"></span>
+    <a href="/" class="btn btn-ghost" style="margin-right:12px;">Programme</a>
+    <a href="/avis-publics.html" class="btn btn-ghost active">Avis</a>
+  </nav>
+
+  <header class="hero">
+    <p class="eyebrow">Cinéma en plein air · Opio</p>
+    <h1>Ils en parlent</h1>
+    <p>Les retours de nos spectateurs après les projections sous les étoiles.</p>
+    <div class="stat" id="stat">
+      <div class="score" id="stat-score">–<small>/5</small></div>
+      <div>
+        <div class="stars" id="stat-stars"></div>
+        <div class="count" id="stat-count"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="grid" id="grid"></div>
+    <div class="empty-state" id="empty" style="display:none;">
+      <div class="ico">✦</div>
+      <h3>Les premiers avis arriveront bientôt</h3>
+      <p>Après chaque séance, nous recueillons les retours des spectateurs. Les avis publiés apparaîtront ici.</p>
+    </div>
+  </div>
+
+  <footer>© 2026 Oria — Tous droits réservés</footer>
+
+  <div class="cookie-banner" id="cookie-banner">
+    <p>Nous utilisons des cookies de mesure d'audience. Vous pouvez accepter ou refuser.</p>
+    <div class="row"><button id="cookie-refuse">Refuser</button><button class="accept" id="cookie-accept">Accepter</button></div>
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+  var firebaseConfig = {
+    apiKey: "AIzaSyBB-WiFkZfrHQD9rXDQ6KjbeNQyMlO4VbA",
+    authDomain: "cinema-en-pleine-air-opi-ac81e.firebaseapp.com",
+    projectId: "cinema-en-pleine-air-opi-ac81e",
+    storageBucket: "cinema-en-pleine-air-opi-ac81e.firebasestorage.app",
+    messagingSenderId: "245777069404",
+    appId: "1:245777069404:web:8478506b55ec08fb8abd99",
+    measurementId: "G-R66JNXKKPZ"
+  };
+  var app = initializeApp(firebaseConfig);
+  var db = getFirestore(app);
+
+  function esc(s){var d=document.createElement('div');d.textContent=s==null?'':String(s);return d.innerHTML;}
+  function stars(n){var s='';for(var i=1;i<=5;i++){s+= i<=n ? '★' : '<span class="empty">★</span>';}return s;}
+  function initiale(txt){return (txt||'?').trim().charAt(0).toUpperCase();}
+
+  getDocs(collection(db,'avis_publics')).then(function(snap){
+    var items=[];
+    snap.forEach(function(d){items.push(d.data());});
+    items.sort(function(a,b){
+      var ta=a.avisCreatedAt&&a.avisCreatedAt.toMillis?a.avisCreatedAt.toMillis():0;
+      var tb=b.avisCreatedAt&&b.avisCreatedAt.toMillis?b.avisCreatedAt.toMillis():0;
+      return tb-ta;
+    });
+    var grid=document.getElementById('grid');
+    var empty=document.getElementById('empty');
+    if(!items.length){empty.style.display='block';return;}
+    grid.innerHTML=items.map(function(a){
+      return '<article class="card"><div class="stars">'+stars(a.note)+'</div>'+
+        '<p class="comment">'+esc(a.commentaire)+'</p>'+
+        '<div class="meta"><div class="avatar">'+esc(initiale(a.prenomInitiale))+'</div>'+
+        '<div><div class="who">'+esc(a.prenomInitiale)+'</div>'+
+        (a.seanceLabel?'<div class="seance">'+esc(a.seanceLabel)+'</div>':'')+'</div></div></article>';
+    }).join('');
+    var somme=items.reduce(function(t,a){return t+(a.note||0);},0);
+    var moy=somme/items.length;
+    document.getElementById('stat-score').innerHTML=moy.toFixed(1).replace('.',',')+'<small>/5</small>';
+    document.getElementById('stat-stars').innerHTML=stars(Math.round(moy));
+    document.getElementById('stat-count').textContent='sur '+items.length+' avis publié'+(items.length>1?'s':'');
+    document.getElementById('stat').style.display='inline-flex';
+  }).catch(function(){});
+
+  // Bandeau cookies + Analytics (chargé seulement après consentement)
+  (function(){
+    var KEY='cookie-consent-opio';var banner=document.getElementById('cookie-banner');
+    function loadAnalytics(){import("https://www.gstatic.com/firebasejs/10.13.0/firebase-analytics.js").then(function(m){m.getAnalytics(app);}).catch(function(){});}
+    var choice=null;try{choice=localStorage.getItem(KEY);}catch(e){}
+    if(choice==='accepted'){loadAnalytics();}
+    else if(choice!=='refused'&&banner){
+      requestAnimationFrame(function(){banner.classList.add('is-visible');});
+      var a=document.getElementById('cookie-accept'),r=document.getElementById('cookie-refuse');
+      if(a)a.addEventListener('click',function(){try{localStorage.setItem(KEY,'accepted');}catch(e){}banner.classList.remove('is-visible');loadAnalytics();});
+      if(r)r.addEventListener('click',function(){try{localStorage.setItem(KEY,'refused');}catch(e){}banner.classList.remove('is-visible');});
+    }
+  })();
+</script>
+</body>
+</html>
