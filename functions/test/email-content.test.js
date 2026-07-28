@@ -63,15 +63,17 @@ test("la confirmation utilise la date et le film de l'evenement", () => {
 });
 
 test("buildOriaNewReservationEmail is addressed to Oria and lists quantities", () => {
-  const email = buildOriaNewReservationEmail(sampleReservation);
+  const email = buildOriaNewReservationEmail(sampleReservation, sampleEvent);
   expect(email.to).toBe("Oria.ei@outlook.fr");
   expect(email.htmlContent).toContain("Jean Dupont");
   expect(email.htmlContent).toContain("13 €");
+  expect(email.subject).toContain("Mardi 18 août 2026"); // séance dans l'objet
 });
 
 test("buildOriaCancellationEmail mentions the freed places", () => {
-  const email = buildOriaCancellationEmail(sampleReservation);
+  const email = buildOriaCancellationEmail(sampleReservation, sampleEvent);
   expect(email.htmlContent).toContain("Places libérées : 3");
+  expect(email.subject).toContain("Mardi 18 août 2026"); // séance dans l'objet
 });
 
 test("buildVisitorCancellationEmail : destine au visiteur, mentionne les places liberees", () => {

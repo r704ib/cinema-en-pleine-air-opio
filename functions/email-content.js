@@ -70,13 +70,20 @@ function buildVisitorConfirmationEmail(reservation, reservationId, event) {
   };
 }
 
-function buildOriaNewReservationEmail(reservation) {
+function seanceLabel(reservation, event) {
+  if (event && event.dateLabel) return event.dateLabel;
+  return reservation.eventId || "séance";
+}
+
+function buildOriaNewReservationEmail(reservation, event) {
+  const seance = seanceLabel(reservation, event);
   return {
     to: ORIA_EMAIL,
-    subject: "Nouvelle réservation : " + reservation.prenom + " " + reservation.nom,
+    subject: "Nouvelle réservation — " + seance + " — " + reservation.prenom + " " + reservation.nom,
     htmlContent:
       "<p>Nouvelle réservation reçue.</p>" +
       "<ul>" +
+      "<li><strong>Séance : " + seance + "</strong></li>" +
       "<li>Nom : " + reservation.prenom + " " + reservation.nom + "</li>" +
       "<li>Email : " + reservation.email + "</li>" +
       "<li>Téléphone : " + reservation.telephone + "</li>" +
@@ -88,13 +95,15 @@ function buildOriaNewReservationEmail(reservation) {
   };
 }
 
-function buildOriaCancellationEmail(reservation) {
+function buildOriaCancellationEmail(reservation, event) {
+  const seance = seanceLabel(reservation, event);
   return {
     to: ORIA_EMAIL,
-    subject: "Annulation : " + reservation.prenom + " " + reservation.nom,
+    subject: "Annulation — " + seance + " — " + reservation.prenom + " " + reservation.nom,
     htmlContent:
       "<p>Une réservation vient d'être annulée.</p>" +
       "<ul>" +
+      "<li><strong>Séance : " + seance + "</strong></li>" +
       "<li>Nom : " + reservation.prenom + " " + reservation.nom + "</li>" +
       "<li>Places libérées : " + reservation.totalPlaces + "</li>" +
       "</ul>",

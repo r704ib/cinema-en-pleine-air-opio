@@ -219,7 +219,7 @@ exports.onReservationCreated = onDocumentCreated(
     const ev = await loadEvent(reservation.eventId || DEFAULT_EVENT_ID);
 
     await sendEmail(apiKey, buildVisitorConfirmationEmail(reservation, reservationId, ev));
-    await sendEmail(apiKey, buildOriaNewReservationEmail(reservation));
+    await sendEmail(apiKey, buildOriaNewReservationEmail(reservation, ev));
     logger.info("Reservation emails sent", { reservationId });
   }
 );
@@ -239,7 +239,7 @@ exports.onReservationCancelled = onDocumentUpdated(
         logger.error("Cancellation visitor email failed", { reservationId, error: String(err) });
       }
       try {
-        await sendEmail(apiKey, buildOriaCancellationEmail(after));
+        await sendEmail(apiKey, buildOriaCancellationEmail(after, ev));
       } catch (err) {
         logger.error("Cancellation Oria email failed", { reservationId, error: String(err) });
       }
