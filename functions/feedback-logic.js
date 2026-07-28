@@ -4,6 +4,7 @@ const MAX_FEEDBACK_EMAILS_PER_DAY = 50;
 const FEEDBACK_REMINDER_DELAY_DAYS = 3;
 const MAX_FEEDBACK_TEXT_LENGTH = 2000;
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const FEEDBACK_WINDOW_DAYS = 14;
 
 function normalizeEmail(email) {
   return String(email == null ? "" : email).trim().toLowerCase();
@@ -67,26 +68,36 @@ function toMillis(value) {
 
 function selectFeedbackRecipients(params) {
   const reservations = params.reservations || [];
+  const events = params.events || [];
   const avisReservationIds = params.avisReservationIds || new Set();
   const now = toMillis(params.now);
-  const sessionDate = toMillis(params.sessionDate);
-  const feedbackEnabled = params.feedbackEnabled === true;
-  const eventId = params.eventId || null;
   const maxPerDay = params.maxPerDay || MAX_FEEDBACK_EMAILS_PER_DAY;
   const reminderDelayMs = (params.reminderDelayDays || FEEDBACK_REMINDER_DELAY_DAYS) * ONE_DAY_MS;
+  const windowDays = params.windowDays || FEEDBACK_WINDOW_DAYS;
 
-  if (!feedbackEnabled) return [];
-  if (typeof sessionDate !== "number" || typeof now !== "number") return [];
+  if (typeof now !== "number") return [];
   const nowDay = new Date(now); nowDay.setHours(0, 0, 0, 0);
-  const sessionDay = new Date(sessionDate); sessionDay.setHours(0, 0, 0, 0);
-  if (nowDay.getTime() <= sessionDay.getTime()) return [];
+  const nowDayMs = nowDay.getTime();
+  const windowStartMs = nowDayMs - windowDays * ONE_DAY_MS;
+
+  const eligible = new Set();
+  for (let i = 0; i < events.length; i++) {
+    const ev = events[i];
+    if (ev.feedbackEnabled === false) continue;
+    const sd = toMillis(ev.sessionDate);
+    if (typeof sd !== "number") continue;
+    const sessionDay = new Date(sd); sessionDay.setHours(0, 0, 0, 0);
+    const sessionDayMs = sessionDay.getTime();
+    if (nowDayMs <= sessionDayMs) continue;      // pas encore le lendemain
+    if (sessionDayMs < windowStartMs) continue;  // trop ancien (hors fenêtre)
+    eligible.add(ev.id);
+  }
 
   const firstRequests = [];
   const reminders = [];
-
   for (let i = 0; i < reservations.length; i++) {
     const r = reservations[i];
-    if (eventId && r.eventId !== eventId) continue;
+    if (!eligible.has(r.eventId)) continue;
     if (r.status !== "active") continue;
     if (r.avisOptOut === true) continue;
     if (avisReservationIds.has(r.id)) continue;
@@ -109,6 +120,7 @@ module.exports = {
   FEEDBACK_REMINDER_DELAY_DAYS: FEEDBACK_REMINDER_DELAY_DAYS,
   MAX_FEEDBACK_TEXT_LENGTH: MAX_FEEDBACK_TEXT_LENGTH,
   ONE_DAY_MS: ONE_DAY_MS,
+  FEEDBACK_WINDOW_DAYS: FEEDBACK_WINDOW_DAYS,
   normalizeEmail: normalizeEmail,
   validateFeedbackInput: validateFeedbackInput,
   matchReservationByEmail: matchReservationByEmail,
