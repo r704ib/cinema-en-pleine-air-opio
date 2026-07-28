@@ -242,6 +242,54 @@ d'avis partiront automatiquement (par lots de 50/jour), avec une relance unique
 
 ---
 
+## 💬 Publier et modérer les avis
+
+Les avis reçus ne s'affichent pas automatiquement sur le site : ils passent
+d'abord par une étape de **modération**, pour garder le contrôle sur ce qui est
+publié.
+
+- **Page publique `avis-publics.html`** (lien **« Avis »** dans le menu du
+  site) : affiche les avis que tu as choisi de publier — étoiles, commentaire,
+  et « Prénom I. — séance du … ».
+- **Écran d'administration `admin.html`** : c'est là que tu vois tous les avis
+  reçus et que tu décides de les **publier** ou de les **retirer**. Son adresse
+  n'apparaît nulle part dans le menu du site — **garde-la pour toi** (elle
+  ressemble à `https://cinema-en-pleine-air-opio.oria-events.fr/admin.html`) —
+  et elle est de toute façon **protégée par une connexion** (email + mot de
+  passe).
+
+### 🔑 Mise en place du compte admin (une seule fois)
+
+Avant de pouvoir te connecter à `admin.html`, il faut créer ton compte :
+
+1. Aller sur **https://console.firebase.google.com**, ouvrir le projet
+   **« Cinema-en-pleine-air-Opio »**.
+2. Menu de gauche → **« Authentication »**.
+3. Onglet **« Sign-in method »** → activer le fournisseur **« Email/Mot de
+   passe »**.
+4. Onglet **« Users »** → **« Add user »** → renseigner ton email (celui de
+   l'exploitant) et un mot de passe de ton choix.
+
+Une fois ce compte créé, tu peux te connecter sur `admin.html` avec cet email
+et ce mot de passe.
+
+### ✅ Ce qui rend un avis public
+
+Un avis n'apparaît sur la page publique que si **les deux conditions** sont
+réunies :
+
+1. La personne a **coché la case de consentement** en déposant son avis.
+2. Toi, depuis `admin.html`, tu as cliqué sur **« Publier »** pour cet avis.
+
+Sans consentement, le bouton « Publier » reste bloqué, même si tu le souhaites.
+Tu peux à tout moment **retirer** un avis déjà publié.
+
+**Confidentialité :** la page publique ne montre jamais l'email ni le nom
+complet de la personne — uniquement ses **initiales** (prénom + première
+lettre du nom, ex. « Julie D. »).
+
+---
+
 ## 🚀 Améliorations à venir (idées notées)
 
 Idées validées comme faisables, à construire plus tard (à froid, après une
