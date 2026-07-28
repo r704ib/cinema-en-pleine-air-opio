@@ -71,22 +71,19 @@ test("matchReservationByEmail matches regardless of case/spaces", () => {
 });
 
 function baseParams(overrides) {
-  const session = new Date(2026, 6, 28, 20, 30, 0); // 28/07/2026 20h30
   return Object.assign(
     {
       reservations: [],
+      events: [{ id: "opio-2026-07-28", sessionDate: new Date(2026, 6, 28, 20, 30, 0) }],
       avisReservationIds: new Set(),
       now: new Date(2026, 6, 29, 9, 0, 0), // J+1 à 9h (le lendemain matin)
-      sessionDate: session,
-      feedbackEnabled: true,
     },
     overrides || {}
   );
 }
 
-test("ne cible que les reservations de l'eventId fourni", () => {
+test("ne cible que les reservations d'une seance eligible", () => {
   const out = selectFeedbackRecipients(baseParams({
-    eventId: "opio-2026-07-28",
     reservations: [
       { id: "a", eventId: "opio-2026-07-28", status: "active", email: "a@b.fr", prenom: "A" },
       { id: "b", eventId: "opio-2026-08-18", status: "active", email: "b@b.fr", prenom: "B" },
@@ -95,46 +92,77 @@ test("ne cible que les reservations de l'eventId fourni", () => {
   expect(out.map(function (r) { return r.reservationId; })).toEqual(["a"]);
 });
 
-test("returns nothing when feedback is disabled", () => {
-  const out = selectFeedbackRecipients(baseParams({ feedbackEnabled: false,
-    reservations: [{ id: "1", status: "active", email: "a@b.fr", prenom: "A" }] }));
+test("une seance avec feedbackEnabled:false est ignoree", () => {
+  const out = selectFeedbackRecipients(baseParams({
+    events: [{ id: "opio-2026-07-28", sessionDate: new Date(2026, 6, 28, 20, 30, 0), feedbackEnabled: false }],
+    reservations: [{ id: "1", eventId: "opio-2026-07-28", status: "active", email: "a@b.fr", prenom: "A" }],
+  }));
   expect(out).toEqual([]);
 });
 
-test("returns nothing before session day + 1", () => {
+test("rien le soir meme (seance pas encore passee)", () => {
   const out = selectFeedbackRecipients(baseParams({
-    now: new Date(2026, 6, 28, 23, 0, 0), // même soir, trop tôt
-    reservations: [{ id: "1", status: "active", email: "a@b.fr", prenom: "A" }],
+    now: new Date(2026, 6, 28, 23, 0, 0),
+    reservations: [{ id: "1", eventId: "opio-2026-07-28", status: "active", email: "a@b.fr", prenom: "A" }],
   }));
   expect(out).toEqual([]);
+});
+
+test("les reservants d'une seance future ne recoivent rien", () => {
+  const out = selectFeedbackRecipients(baseParams({
+    events: [{ id: "opio-2026-08-18", sessionDate: new Date(2026, 7, 18, 20, 30, 0) }],
+    reservations: [{ id: "x", eventId: "opio-2026-08-18", status: "active", email: "x@b.fr", prenom: "X" }],
+  }));
+  expect(out).toEqual([]);
+});
+
+test("une seance passee de plus de 14 jours est hors fenetre", () => {
+  const out = selectFeedbackRecipients(baseParams({
+    events: [{ id: "vieux", sessionDate: new Date(2026, 6, 10, 20, 30, 0) }], // 10 juillet, 19 j avant le 29
+    reservations: [{ id: "o", eventId: "vieux", status: "active", email: "o@b.fr", prenom: "O" }],
+  }));
+  expect(out).toEqual([]);
+});
+
+test("deux seances eligibles : chacun ses reservants", () => {
+  const out = selectFeedbackRecipients(baseParams({
+    events: [
+      { id: "e1", sessionDate: new Date(2026, 6, 28, 20, 30, 0) },
+      { id: "e2", sessionDate: new Date(2026, 6, 27, 20, 30, 0) },
+    ],
+    reservations: [
+      { id: "a", eventId: "e1", status: "active", email: "a@b.fr", prenom: "A" },
+      { id: "b", eventId: "e2", status: "active", email: "b@b.fr", prenom: "B" },
+    ],
+  }));
+  expect(out.map(function (r) { return r.reservationId; }).sort()).toEqual(["a", "b"]);
 });
 
 test("first requests: only active, not opted-out, not already asked, no existing avis", () => {
   const out = selectFeedbackRecipients(baseParams({
     reservations: [
-      { id: "1", status: "active", email: "a@b.fr", prenom: "A" },
-      { id: "2", status: "cancelled", email: "c@b.fr", prenom: "C" },
-      { id: "3", status: "active", email: "d@b.fr", prenom: "D", avisOptOut: true },
-      { id: "4", status: "active", email: "e@b.fr", prenom: "E", avisRequestSent: true, avisRequestSentAt: new Date(2026, 6, 29, 8, 0, 0) },
+      { id: "1", eventId: "opio-2026-07-28", status: "active", email: "a@b.fr", prenom: "A" },
+      { id: "2", eventId: "opio-2026-07-28", status: "cancelled", email: "c@b.fr", prenom: "C" },
+      { id: "3", eventId: "opio-2026-07-28", status: "active", email: "d@b.fr", prenom: "D", avisOptOut: true },
+      { id: "4", eventId: "opio-2026-07-28", status: "active", email: "e@b.fr", prenom: "E", avisRequestSent: true, avisRequestSentAt: new Date(2026, 6, 29, 8, 0, 0) },
     ],
-    avisReservationIds: new Set(["1"]), // déjà un avis pour 1
+    avisReservationIds: new Set(["1"]),
   }));
-  // seuls restent : aucun (1 a un avis, 2 annulé, 3 opt-out, 4 déjà sollicité récemment)
-  expect(out.map((r) => r.reservationId)).toEqual([]);
+  expect(out.map(function (r) { return r.reservationId; })).toEqual([]);
 });
 
 test("first request produced for a fresh active reservation", () => {
   const out = selectFeedbackRecipients(baseParams({
-    reservations: [{ id: "9", status: "active", email: "z@b.fr", prenom: "Zoe" }],
+    reservations: [{ id: "9", eventId: "opio-2026-07-28", status: "active", email: "z@b.fr", prenom: "Zoe" }],
   }));
   expect(out).toEqual([{ reservationId: "9", type: "request", email: "z@b.fr", prenom: "Zoe" }]);
 });
 
 test("reminder after 3 days for someone asked but without avis", () => {
   const out = selectFeedbackRecipients(baseParams({
-    now: new Date(2026, 7, 1, 9, 0, 0), // 3 jours après avisRequestSentAt
+    now: new Date(2026, 7, 1, 9, 0, 0),
     reservations: [{
-      id: "7", status: "active", email: "g@b.fr", prenom: "G",
+      id: "7", eventId: "opio-2026-07-28", status: "active", email: "g@b.fr", prenom: "G",
       avisRequestSent: true, avisRequestSentAt: new Date(2026, 6, 29, 9, 0, 0),
     }],
   }));
@@ -145,7 +173,7 @@ test("no reminder if avisRelanceSent already true", () => {
   const out = selectFeedbackRecipients(baseParams({
     now: new Date(2026, 7, 1, 9, 0, 0),
     reservations: [{
-      id: "7", status: "active", email: "g@b.fr", prenom: "G",
+      id: "7", eventId: "opio-2026-07-28", status: "active", email: "g@b.fr", prenom: "G",
       avisRequestSent: true, avisRequestSentAt: new Date(2026, 6, 29, 9, 0, 0), avisRelanceSent: true,
     }],
   }));
@@ -154,8 +182,8 @@ test("no reminder if avisRelanceSent already true", () => {
 
 test("caps the total at maxPerDay, first requests prioritized", () => {
   const reservations = [];
-  for (let i = 0; i < 60; i++) reservations.push({ id: "r" + i, status: "active", email: i + "@b.fr", prenom: "P" + i });
+  for (let i = 0; i < 60; i++) reservations.push({ id: "r" + i, eventId: "opio-2026-07-28", status: "active", email: i + "@b.fr", prenom: "P" + i });
   const out = selectFeedbackRecipients(baseParams({ reservations: reservations, maxPerDay: 50 }));
   expect(out.length).toBe(50);
-  expect(out.every((r) => r.type === "request")).toBe(true);
+  expect(out.every(function (r) { return r.type === "request"; })).toBe(true);
 });
