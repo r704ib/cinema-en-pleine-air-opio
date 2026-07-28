@@ -86,23 +86,12 @@ async function sendEmail(apiKey, email) {
 // fixe (l'exploitant), donc sans risque. Déclenché à la demande via son URL.
 exports.sendTestFeedbackEmail = onCall({ secrets: [BREVO_API_KEY] }, async () => {
   const apiKey = BREVO_API_KEY.value();
-  const eventsSnap = await db.collection("events").get();
-  const nowMs = Date.now();
-  const upcomingEvents = [];
-  let refEvent = null;
-  eventsSnap.forEach(function (d) {
-    const e = Object.assign({ id: d.id }, d.data());
-    if (d.id === DEFAULT_EVENT_ID) refEvent = e;
-    if (e.ouvertResa === true && e.dateISO && e.dateISO.toMillis() > nowMs) {
-      upcomingEvents.push({ filmTitre: e.filmTitre, dateLabel: e.dateLabel, lieu: e.lieu, afficheImg: e.afficheImg, slug: e.slug });
-    }
-  });
-  upcomingEvents.sort(function (a, b) { return 0; });
+  const refEvent = await loadEvent(DEFAULT_EVENT_ID);
   // Une réservation réelle du 28/07 pour que le lien "Donner mon avis" fonctionne.
   const resSnap = await db.collection("reservations").where("eventId", "==", DEFAULT_EVENT_ID).limit(1).get();
   const reservationId = resSnap.empty ? "TEST" : resSnap.docs[0].id;
   const reservation = { email: "Oria.ei@outlook.fr", prenom: "Oria" };
-  await sendEmail(apiKey, buildFeedbackRequestEmail(reservation, reservationId, refEvent, upcomingEvents));
+  await sendEmail(apiKey, buildFeedbackRequestEmail(reservation, reservationId, refEvent));
   logger.info("Test feedback email sent");
   return { sent: true };
 });
@@ -352,15 +341,6 @@ exports.sendFeedbackRequests = onSchedule(
       eventMap[d.id] = Object.assign({ id: d.id }, data);
     });
 
-    const nowMs = Date.now();
-    const upcomingEvents = Object.keys(eventMap)
-      .map(function (id) { return eventMap[id]; })
-      .filter(function (e) { return e.ouvertResa === true && e.dateISO && e.dateISO.toMillis() > nowMs; })
-      .sort(function (a, b) { return a.dateISO.toMillis() - b.dateISO.toMillis(); })
-      .map(function (e) {
-        return { filmTitre: e.filmTitre, dateLabel: e.dateLabel, lieu: e.lieu, afficheImg: e.afficheImg, slug: e.slug };
-      });
-
     const resSnap = await db.collection("reservations").get();
     const reservations = resSnap.docs.map(function (d) {
       const data = d.data();
@@ -401,13 +381,13 @@ exports.sendFeedbackRequests = onSchedule(
       const ev = eventMap[resEventById[rec.reservationId]] || eventMap[DEFAULT_EVENT_ID];
       try {
         if (rec.type === "request") {
-          await sendEmail(apiKey, buildFeedbackRequestEmail(reservation, rec.reservationId, ev, upcomingEvents));
+          await sendEmail(apiKey, buildFeedbackRequestEmail(reservation, rec.reservationId, ev));
           await db.collection("reservations").doc(rec.reservationId).set(
             { avisRequestSent: true, avisRequestSentAt: FieldValue.serverTimestamp() },
             { merge: true }
           );
         } else {
-          await sendEmail(apiKey, buildFeedbackReminderEmail(reservation, rec.reservationId, ev, upcomingEvents));
+          await sendEmail(apiKey, buildFeedbackReminderEmail(reservation, rec.reservationId, ev));
           await db.collection("reservations").doc(rec.reservationId).set(
             { avisRelanceSent: true, avisRelanceSentAt: FieldValue.serverTimestamp() },
             { merge: true }

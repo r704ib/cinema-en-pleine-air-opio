@@ -132,32 +132,7 @@ function buildVisitorCancellationEmail(reservation, reservationId, event) {
   };
 }
 
-function blocProchainesSeances(upcomingEvents) {
-  if (!upcomingEvents || upcomingEvents.length === 0) return "";
-  const cartes = upcomingEvents.map(function (ev) {
-    const url = SITE_URL + "/" + ev.slug + ".html";
-    const affiche = SITE_URL + "/" + ev.afficheImg;
-    return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" ' +
-      'style="background-color:#FFFFFF; border:2px solid #E8A33D; border-radius:12px; margin-bottom:14px;"><tr>' +
-      '<td width="96" style="padding:16px 0 16px 16px; vertical-align:top;">' +
-      '<img src="' + affiche + '" width="80" alt="' + ev.filmTitre + '" style="width:80px; border-radius:6px; display:block;"></td>' +
-      '<td style="padding:16px 18px; vertical-align:top;">' +
-      '<div style="font-family:Georgia,serif; font-size:18px; color:#241A38; font-weight:bold;">' + ev.filmTitre + "</div>" +
-      '<div style="font-size:14px; color:#3b3152; margin:6px 0 2px;">&#128197; <strong>' + ev.dateLabel + "</strong></div>" +
-      '<div style="font-size:14px; color:#3b3152; margin-bottom:12px;">&#128205; ' + ev.lieu + "</div>" +
-      '<a href="' + url + '" style="display:inline-block; background:#E8A33D; color:#241A38; font-size:14px; ' +
-      'font-weight:bold; text-decoration:none; padding:10px 22px; border-radius:8px;">Réserver ma place</a>' +
-      "</td></tr></table>";
-  }).join("");
-  return '<div style="margin-top:34px; border-top:1px solid rgba(36,26,56,.12); padding-top:26px;">' +
-    '<div style="font-family:Georgia,serif; font-size:20px; color:#241A38; text-align:center; margin-bottom:18px;">' +
-    '<span style="color:#E8A33D;">&#10022;</span> Nos prochaines séances</div>' +
-    cartes +
-    '<p style="font-size:14px; color:#6a5f80; text-align:center; margin:16px 0 0;">' +
-    "Au plaisir de vous revoir sous les étoiles&nbsp;!</p></div>";
-}
-
-function buildFeedbackRequestEmail(reservation, reservationId, event, upcomingEvents) {
+function buildFeedbackRequestEmail(reservation, reservationId, event) {
   const url = SITE_URL + "/avis.html?id=" + reservationId;
   const corps =
     '<p style="font-size:17px; line-height:1.5; margin:0 0 14px;">Bonjour <strong>' +
@@ -165,8 +140,7 @@ function buildFeedbackRequestEmail(reservation, reservationId, event, upcomingEv
     '<p style="font-size:16px; line-height:1.6; color:#3b3152; margin:0 0 28px;">' +
     "Merci d'être venu(e) à la séance&nbsp;! Votre retour nous aide beaucoup à préparer de plus " +
     "belles projections. Cela ne prend qu'une minute.</p>" +
-    '<div style="text-align:center;">' + bouton("Donner mon avis", url) + "</div>" +
-    blocProchainesSeances(upcomingEvents);
+    '<div style="text-align:center;">' + bouton("Donner mon avis", url) + "</div>";
   return {
     to: reservation.email,
     subject: "Votre avis sur le Cinéma en plein air d'Opio",
@@ -178,7 +152,7 @@ function buildFeedbackRequestEmail(reservation, reservationId, event, upcomingEv
   };
 }
 
-function buildFeedbackReminderEmail(reservation, reservationId, event, upcomingEvents) {
+function buildFeedbackReminderEmail(reservation, reservationId, event) {
   const url = SITE_URL + "/avis.html?id=" + reservationId;
   const stopUrl = url + "&stop=1";
   const corps =
@@ -187,8 +161,7 @@ function buildFeedbackReminderEmail(reservation, reservationId, event, upcomingE
     '<p style="font-size:16px; line-height:1.6; color:#3b3152; margin:0 0 28px;">' +
     "Vous n'avez pas encore donné votre avis sur la séance — votre retour compte beaucoup " +
     "pour nous&nbsp;! Une minute suffit.</p>" +
-    '<div style="text-align:center;">' + bouton("Donner mon avis", url) + "</div>" +
-    blocProchainesSeances(upcomingEvents);
+    '<div style="text-align:center;">' + bouton("Donner mon avis", url) + "</div>";
   const piedExtra =
     '<br><a href="' + stopUrl + '" style="color:#B8AFC9; text-decoration:underline; font-size:11px;">' +
     "Ne plus recevoir ces messages</a>";

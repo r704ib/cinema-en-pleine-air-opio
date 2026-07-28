@@ -28,14 +28,6 @@ const sampleEvent = {
   portes: "20h30", filmHeure: "21h30", finHeure: "~23h15",
 };
 
-const sampleUpcoming = [{
-  filmTitre: "Jumanji : Bienvenue dans la jungle",
-  dateLabel: "Mardi 18 août 2026",
-  lieu: "Cœur du village à Opio 06650",
-  afficheImg: "affiche-jumanji.jpg",
-  slug: "seance-2026-08-18",
-}];
-
 test("buildCancelUrl includes the reservation id", () => {
   const url = buildCancelUrl("abc123");
   expect(url).toBe("https://cinema-en-pleine-air-opio.oria-events.fr/annuler.html?id=abc123");
@@ -118,22 +110,10 @@ test("buildFeedbackReminderEmail includes the avis link and an opt-out link", ()
   expect(email.htmlContent).toContain("Ne plus recevoir"); // lien opt-out habille
 });
 
-test("la demande d'avis affiche le bloc prochaines seances quand fourni", () => {
-  const email = buildFeedbackRequestEmail({ email: "j@x.fr", prenom: "Jean" }, "abc123", sampleEvent, sampleUpcoming);
-  expect(email.htmlContent).toContain("Nos prochaines séances");
-  expect(email.htmlContent).toContain("Jumanji : Bienvenue dans la jungle");
-  expect(email.htmlContent).toContain("Réserver ma place");
-  expect(email.htmlContent).toContain("seance-2026-08-18.html");
-});
-
-test("la demande d'avis sans prochaines seances n'affiche pas le bloc", () => {
-  const email = buildFeedbackRequestEmail({ email: "j@x.fr", prenom: "Jean" }, "abc123", sampleEvent, []);
-  expect(email.htmlContent).not.toContain("Nos prochaines séances");
-});
-
-test("la relance affiche aussi le bloc prochaines seances quand fourni", () => {
-  const email = buildFeedbackReminderEmail({ email: "j@x.fr", prenom: "Jean" }, "abc123", sampleEvent, sampleUpcoming);
-  expect(email.htmlContent).toContain("Nos prochaines séances");
-  expect(email.htmlContent).toContain("seance-2026-08-18.html");
-  expect(email.htmlContent).toContain("stop=1"); // le lien de desinscription reste
+test("les emails d'avis ne contiennent pas de bloc prochaines séances", () => {
+  const req = buildFeedbackRequestEmail({ email: "j@x.fr", prenom: "Jean" }, "abc123", sampleEvent);
+  const rel = buildFeedbackReminderEmail({ email: "j@x.fr", prenom: "Jean" }, "abc123", sampleEvent);
+  expect(req.htmlContent).not.toContain("Nos prochaines séances");
+  expect(rel.htmlContent).not.toContain("Nos prochaines séances");
+  expect(rel.htmlContent).toContain("stop=1"); // le lien de désinscription reste
 });
