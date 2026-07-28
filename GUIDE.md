@@ -230,15 +230,15 @@ Un système d'avis est en place pour recueillir les retours des participants.
 **Voir les avis :** lance `node export-avis.js` dans `outils-export/` → un
 fichier Excel `avis-….xlsx` est créé (note moyenne incluse).
 
-**⚠️ État actuel (Opio) :** l'**envoi automatique des emails d'avis est
-DÉSACTIVÉ** (`meta/session.feedbackEnabled = false`) — rien ne part tout seul.
-Le QR code, lui, reste utilisable sur place indépendamment.
+**Envoi automatique :** les demandes d'avis partent désormais **automatiquement
+le lendemain de chaque séance**, sans aucune activation manuelle — il suffit que
+la fiche de la séance existe dans `events`. Elles ne concernent que les
+réservants de cette séance (par lots de 50/jour, avec une relance unique 3 jours
+après).
 
-**Activer l'envoi automatique pour une prochaine séance :** mettre la date de la
-séance dans `meta/session.sessionDate` et passer `feedbackEnabled` à `true`
-(demande-moi, ou via la console Firebase). Le lendemain matin à 9h, les demandes
-d'avis partiront automatiquement (par lots de 50/jour), avec une relance unique
-3 jours après.
+**Désactiver les avis pour une séance précise :** dans la console Firebase
+(Firestore → `events` → document de la séance), mettre le champ
+`feedbackEnabled` à `false`. Par défaut (champ absent), les avis sont activés.
 
 ---
 

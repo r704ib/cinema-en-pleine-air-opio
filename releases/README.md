@@ -11,6 +11,7 @@ interne) — seul le contenu de `public/` est servi aux visiteurs.
 
 ## Versions
 
+- [v16](v16.md) — 2026-07-28 — Demandes d'avis automatiques pilotées par les séances (interrupteur + fenêtre 14 j).
 - [v15](v15.md) — 2026-07-27 — Page publique d'avis (« Ils en parlent ») + écran d'administration modéré.
 - [v14](v14.md) — 2026-07-27 — Site multi-séances (accueil Programme, page par séance, réservations par événement).
 - [v13](v13.md) — 2026-07-27 — Refonte graphique des emails visiteurs (charte commune, email d'annulation, place du futur QR).
