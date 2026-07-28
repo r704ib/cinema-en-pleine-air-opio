@@ -31,6 +31,29 @@ const SENDER = { name: "Cinéma en plein air Opio", email: "reservations@opio.or
 
 const DEFAULT_EVENT_ID = "opio-2026-07-28";
 
+const ADMIN_EMAIL = "oria.ei@outlook.fr";
+const {
+  seanceLabelFromDateLabel,
+  avisPublicFromAvis,
+} = require("./avis-public-logic");
+
+function assertAdmin(request) {
+  const email = request.auth && request.auth.token && request.auth.token.email;
+  if (!email || String(email).toLowerCase() !== ADMIN_EMAIL) {
+    throw new HttpsError("permission-denied", "Accès réservé à l'administrateur");
+  }
+}
+
+async function resolveSeanceLabel(reservationId) {
+  if (!reservationId) return "";
+  const resSnap = await db.collection("reservations").doc(reservationId).get();
+  if (!resSnap.exists) return "";
+  const eventId = resSnap.data().eventId;
+  if (!eventId) return "";
+  const ev = await loadEvent(eventId);
+  return ev && ev.dateLabel ? seanceLabelFromDateLabel(ev.dateLabel) : "";
+}
+
 async function loadEvent(eventId) {
   const snap = await db.collection("events").doc(eventId).get();
   return snap.exists ? Object.assign({ id: eventId }, snap.data()) : null;
@@ -320,3 +343,60 @@ exports.sendFeedbackRequests = onSchedule(
     logger.info("Feedback: campagne terminée", { envoyes: sent, candidats: recipients.length });
   }
 );
+
+exports.adminListAvis = onCall(async (request) => {
+  assertAdmin(request);
+  const snap = await db.collection("avis").orderBy("createdAt", "desc").get();
+  const avis = [];
+  for (const d of snap.docs) {
+    const a = d.data();
+    const seanceLabel = await resolveSeanceLabel(a.reservationId);
+    avis.push({
+      id: d.id,
+      prenom: a.prenom || "",
+      nom: a.nom || "",
+      email: a.email || "",
+      note: a.note,
+      commentaire: a.commentaire || "",
+      film_souhaite: a.film_souhaite || "",
+      publication_autorisee: a.publication_autorisee === true,
+      publie: a.publie === true,
+      seanceLabel: seanceLabel,
+    });
+  }
+  return { avis: avis };
+});
+
+exports.adminPublishAvis = onCall(async (request) => {
+  assertAdmin(request);
+  const avisId = request.data && request.data.avisId;
+  if (typeof avisId !== "string" || avisId.length === 0) {
+    throw new HttpsError("invalid-argument", "avisId manquant");
+  }
+  const avisRef = db.collection("avis").doc(avisId);
+  const avisSnap = await avisRef.get();
+  if (!avisSnap.exists) {
+    throw new HttpsError("not-found", "AVIS_NOT_FOUND");
+  }
+  const a = avisSnap.data();
+  if (a.publication_autorisee !== true) {
+    throw new HttpsError("failed-precondition", "CONSENT_REQUIRED");
+  }
+  const seanceLabel = await resolveSeanceLabel(a.reservationId);
+  await db.collection("avis_publics").doc(avisId).set(avisPublicFromAvis(a, seanceLabel));
+  await avisRef.update({ publie: true });
+  logger.info("Avis published", { avisId: avisId });
+  return { success: true };
+});
+
+exports.adminUnpublishAvis = onCall(async (request) => {
+  assertAdmin(request);
+  const avisId = request.data && request.data.avisId;
+  if (typeof avisId !== "string" || avisId.length === 0) {
+    throw new HttpsError("invalid-argument", "avisId manquant");
+  }
+  await db.collection("avis_publics").doc(avisId).delete();
+  await db.collection("avis").doc(avisId).update({ publie: false });
+  logger.info("Avis unpublished", { avisId: avisId });
+  return { success: true };
+});
