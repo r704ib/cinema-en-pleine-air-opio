@@ -8,8 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,ital@9..144,300..700,0..1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --c-bg:#15101F; --c-surface:#241A38; --c-gold:#E8A33D; --c-lavender:#9B86C9;
-    --c-ivory:#F6F1E7; --c-muted:#B8AFC9;
+    --c-bg:#FBF7EF; --c-surface:#FFFFFF; --c-gold:#C98A2B; --c-lavender:#7d6fa0;
+    --c-ivory:#241A38; --c-muted:#6a5f80;
     --font-display:'Fraunces','Georgia',serif; --font-body:'Outfit','Helvetica Neue',Arial,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
@@ -18,12 +18,12 @@
     background:var(--c-bg); color:var(--c-ivory); font-family:var(--font-body);
     min-height:100vh; overflow:hidden; position:relative;
     background-image:
-      radial-gradient(circle at 18% 18%, rgba(155,134,201,.18), transparent 42%),
-      radial-gradient(circle at 82% 82%, rgba(232,163,61,.16), transparent 45%);
+      radial-gradient(circle at 18% 18%, rgba(155,134,201,.14), transparent 42%),
+      radial-gradient(circle at 82% 82%, rgba(201,138,43,.13), transparent 45%);
   }
-  /* ciel étoilé */
+  /* étoiles dorées (visibles sur fond clair) */
   .stars{position:fixed;inset:0;z-index:0;overflow:hidden;}
-  .star{position:absolute;background:#fff;border-radius:50%;opacity:.7;animation:tw 3.5s ease-in-out infinite;}
+  .star{position:absolute;background:#C98A2B;border-radius:50%;opacity:.5;animation:tw 3.5s ease-in-out infinite;}
   @keyframes tw{0%,100%{opacity:.15;transform:scale(.8);}50%{opacity:.9;transform:scale(1.2);}}
 
   .stage{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;
@@ -33,7 +33,7 @@
     color:var(--c-gold);font-weight:600;animation:rise 1s ease both;}
   h1{font-family:var(--font-display);font-style:italic;font-weight:600;
     font-size:clamp(4rem,17vw,13rem);line-height:.95;letter-spacing:-.01em;
-    text-shadow:0 6px 40px rgba(232,163,61,.25);animation:rise 1.1s .1s ease both;}
+    color:var(--c-ivory);text-shadow:0 4px 30px rgba(201,138,43,.18);animation:rise 1.1s .1s ease both;}
   .tonight{animation:rise 1.1s .25s ease both;}
   .tonight .tag{display:inline-block;background:var(--c-gold);color:#231A12;font-weight:700;
     padding:6px 16px;border-radius:999px;font-size:clamp(.8rem,1.6vw,1.05rem);letter-spacing:.05em;margin-bottom:14px;}
@@ -42,10 +42,10 @@
 
   /* bloc prochainement */
   .next{position:fixed;z-index:1;right:4vw;bottom:4vh;display:flex;align-items:center;gap:20px;
-    background:rgba(36,26,56,.72);border:1px solid rgba(232,163,61,.4);border-radius:22px;
+    background:rgba(255,255,255,.9);border:2px solid var(--c-gold);border-radius:22px;
     padding:18px 24px 18px 18px;backdrop-filter:blur(10px);max-width:min(92vw,460px);
-    animation:rise 1.2s .5s ease both;box-shadow:0 20px 60px rgba(0,0,0,.4);}
-  .next img{width:96px;border-radius:12px;flex:none;box-shadow:0 8px 22px rgba(0,0,0,.5);}
+    animation:rise 1.2s .5s ease both;box-shadow:0 20px 55px rgba(36,26,56,.16);}
+  .next img{width:96px;border-radius:12px;flex:none;box-shadow:0 8px 22px rgba(36,26,56,.28);}
   .next .lbl{letter-spacing:.28em;text-transform:uppercase;font-size:.72rem;color:var(--c-gold);font-weight:600;margin-bottom:6px;}
   .next .t{font-family:var(--font-display);font-weight:600;font-size:1.15rem;line-height:1.15;}
   .next .d{color:var(--c-lavender);font-size:.92rem;margin:6px 0 2px;}
@@ -53,8 +53,8 @@
 
   @keyframes rise{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:none;}}
 
-  .fsbtn{position:fixed;z-index:2;left:4vw;bottom:4vh;background:rgba(36,26,56,.72);
-    border:1px solid rgba(232,163,61,.5);color:var(--c-ivory);font-family:var(--font-body);
+  .fsbtn{position:fixed;z-index:2;left:4vw;bottom:4vh;background:rgba(255,255,255,.9);
+    border:1px solid var(--c-gold);color:var(--c-ivory);font-family:var(--font-body);
     font-size:.95rem;padding:12px 20px;border-radius:999px;cursor:pointer;backdrop-filter:blur(10px);}
   .fsbtn:hover{border-color:var(--c-gold);color:var(--c-gold);}
 
