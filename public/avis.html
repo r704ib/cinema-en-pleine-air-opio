@@ -46,15 +46,6 @@
   a{color:var(--c-gold);}
   .state{display:none;}
   .home{margin-top:24px;font-size:0.9rem;}
-  .prochaines{margin-top:24px;display:none;}
-  .prochaines h2{font-family:var(--font-display);font-weight:600;font-size:1.15rem;text-align:center;margin:0 0 16px;color:var(--c-ivory);}
-  .prochaines h2 .sp{color:var(--c-gold);}
-  .ps-card{display:flex;gap:14px;align-items:center;background:var(--c-surface);border:1px solid var(--c-gold);border-radius:16px;padding:14px;margin-bottom:12px;}
-  .ps-card img{width:64px;border-radius:8px;flex:none;}
-  .ps-info{flex:1;min-width:0;}
-  .ps-title{font-family:var(--font-display);font-weight:600;font-size:1rem;color:var(--c-ivory);margin-bottom:4px;}
-  .ps-meta{font-size:0.82rem;color:var(--c-muted);margin-bottom:10px;}
-  .ps-btn{display:inline-block;background:var(--c-gold);color:#231A12;text-decoration:none;font-weight:600;font-size:0.85rem;padding:8px 16px;border-radius:999px;}
 </style>
 </head>
 <body>
@@ -115,17 +106,12 @@
       <p>Une erreur est survenue, ou ce lien n'est pas valide. Réessayez plus tard.</p>
     </div>
 
-    <div class="prochaines" id="prochaines-seances">
-      <h2><span class="sp">✦</span> Nos prochaines séances</h2>
-      <div id="ps-list"></div>
-    </div>
-
     <p class="home"><a href="/">← Retour au site du Cinéma en plein air d'Opio</a></p>
   </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-  import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
   import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-functions.js";
 
   var firebaseConfig = {
@@ -151,38 +137,6 @@
   function show(id) {
     ['loading-state','form-state','success-state','already-state','stop-state','error-state']
       .forEach(function (s) { el(s).style.display = (s === id) ? 'block' : 'none'; });
-    if (id === 'success-state' || id === 'already-state') {
-      renderProchaines();
-    } else {
-      var p = el('prochaines-seances'); if (p) p.style.display = 'none';
-    }
-  }
-
-  var prochainesLoaded = false;
-  async function renderProchaines() {
-    var wrap = el('prochaines-seances');
-    if (prochainesLoaded) { if (wrap) wrap.style.display = 'block'; return; }
-    prochainesLoaded = true;
-    try {
-      var snap = await getDocs(collection(db, 'events'));
-      var now = Date.now();
-      var events = [];
-      snap.forEach(function (d) {
-        var e = d.data();
-        if (e.ouvertResa === true && e.dateISO && e.dateISO.toMillis() > now) events.push(e);
-      });
-      events.sort(function (a, b) { return a.dateISO.toMillis() - b.dateISO.toMillis(); });
-      if (!events.length) return;
-      function esc(s) { var t = document.createElement('div'); t.textContent = s == null ? '' : String(s); return t.innerHTML; }
-      el('ps-list').innerHTML = events.map(function (e) {
-        return '<div class="ps-card">' +
-          '<img src="/' + esc(e.afficheImg) + '" alt="' + esc(e.filmTitre) + '" onerror="this.style.display=\'none\'">' +
-          '<div class="ps-info"><div class="ps-title">' + esc(e.filmTitre) + '</div>' +
-          '<div class="ps-meta">' + esc(e.dateLabel) + ' · ' + esc(e.lieu) + '</div>' +
-          '<a class="ps-btn" href="/' + esc(e.slug) + '.html">Réserver dès maintenant</a></div></div>';
-      }).join('');
-      if (wrap) wrap.style.display = 'block';
-    } catch (e) { /* silencieux : le bloc reste masqué */ }
   }
 
   var note = 0;
