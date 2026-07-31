@@ -207,6 +207,38 @@ function buildJourJReminderEmail(reservation, event) {
   };
 }
 
+function buildSeanceAnnulationEmail(reservation, dateLabel) {
+  const encadre =
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" ' +
+    'style="background-color:#FFFFFF; border:2px solid #E8A33D; border-radius:12px; margin:6px 0 20px;">' +
+    '<tr><td style="padding:18px 22px; font-size:15px; line-height:1.6; color:#3b3152;">' +
+    "&#10004;&nbsp; <strong>Aucun paiement ne vous a été demandé</strong> — vous n'avez donc aucune " +
+    "démarche à effectuer de votre côté.</td></tr></table>";
+  const corps =
+    '<p style="font-size:17px; line-height:1.5; margin:0 0 14px;">Bonjour <strong>' + reservation.prenom + "</strong>,</p>" +
+    '<p style="font-size:16px; line-height:1.6; color:#3b3152; margin:0 0 16px;">' +
+    "C'est avec beaucoup de regret que nous devons vous annoncer l'<strong>annulation de la séance</strong> " +
+    "de cinéma en plein air prévue le <strong>" + dateLabel + "</strong>.</p>" +
+    '<p style="font-size:16px; line-height:1.6; color:#3b3152; margin:0 0 16px;">' +
+    "Pour des raisons indépendantes de notre volonté, nous ne sommes malheureusement pas en mesure de " +
+    "la maintenir. Nous en sommes sincèrement désolés et mesurons la déception que cela peut occasionner.</p>" +
+    encadre +
+    '<p style="font-size:16px; line-height:1.6; color:#3b3152; margin:0 0 16px;">' +
+    "Nous espérons vraiment vous retrouver lors d'une prochaine projection sous les étoiles d'Opio. " +
+    "Nous vous tiendrons informé(e) des futures séances.</p>" +
+    '<p style="font-size:16px; line-height:1.6; color:#3b3152; margin:0;">' +
+    "Merci de votre compréhension, et encore toutes nos excuses.</p>";
+  return {
+    to: reservation.email,
+    subject: "Annulation de la séance — Cinéma en plein air d'Opio",
+    htmlContent: emailShell({
+      titre: "Séance annulée",
+      preheader: "La séance du " + dateLabel + " est malheureusement annulée.",
+      corpsHtml: corps,
+    }),
+  };
+}
+
 module.exports = {
   buildCancelUrl,
   buildVisitorConfirmationEmail,
@@ -216,4 +248,5 @@ module.exports = {
   buildFeedbackRequestEmail,
   buildFeedbackReminderEmail,
   buildJourJReminderEmail,
+  buildSeanceAnnulationEmail,
 };
