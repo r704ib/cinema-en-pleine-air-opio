@@ -457,6 +457,14 @@ footer{
   .cookie-banner__actions{width:100%;}
   .cookie-btn{flex:1;}
 }
+.op-overlay{position:fixed;inset:0;background:rgba(10,7,18,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:100;}
+.op-overlay.show{display:flex;}
+.op-panel{background:var(--c-surface,#241A38);border:1px solid rgba(232,163,61,.4);border-radius:20px;padding:28px;max-width:340px;width:calc(100% - 40px);text-align:center;position:relative;}
+.op-panel h3{font-family:var(--font-display,'Fraunces',serif);color:var(--c-ivory,#F6F1E7);margin:0 0 4px;font-size:1.3rem;}
+.op-panel p{color:var(--c-muted,#B8AFC9);font-size:.85rem;margin:0 0 18px;}
+.op-panel a{display:block;background:var(--c-gold,#E8A33D);color:#231A12;text-decoration:none;font-weight:600;padding:13px;border-radius:12px;margin-top:10px;}
+.op-panel a.ghost{background:transparent;color:var(--c-ivory,#F6F1E7);border:1px solid rgba(246,241,231,.2);}
+.op-close{position:absolute;top:10px;right:16px;background:none;border:none;color:var(--c-muted,#B8AFC9);font-size:1.5rem;cursor:pointer;line-height:1;}
 </style>
 </head>
 <body>
@@ -469,6 +477,16 @@ footer{
   <a href="/" class="btn btn-ghost" style="margin-right:12px;">Programme</a>
   <a href="/avis-publics.html" class="btn btn-ghost">Avis</a>
 </nav>
+
+<div class="op-overlay" id="op-overlay" aria-hidden="true">
+  <div class="op-panel" role="dialog" aria-label="Espace organisateur">
+    <button class="op-close" id="op-close" aria-label="Fermer">&times;</button>
+    <h3>Espace organisateur</h3>
+    <p>Accès réservé — invisible pour le public.</p>
+    <a href="/admin.html">⭐ Modérer les avis</a>
+    <a class="ghost" href="/bienvenue.html">📺 Écran d'accueil (Bienvenue)</a>
+  </div>
+</div>
 
 <main id="main">
 
@@ -636,6 +654,24 @@ footer{
         btn.style.setProperty('--my', my + '%');
       });
     });
+  }
+
+  /* ---------- Accès organisateur (5 clics sur le logo) ---------- */
+  var brand = document.querySelector('.brand');
+  var overlay = document.getElementById('op-overlay');
+  if (brand && overlay) {
+    var clicks = 0, timer = null;
+    brand.addEventListener('click', function (e) {
+      e.preventDefault();
+      clicks++;
+      clearTimeout(timer);
+      timer = setTimeout(function () { clicks = 0; }, 1500);
+      if (clicks >= 5) { clicks = 0; overlay.classList.add('show'); }
+    });
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.classList.remove('show'); });
+    var opClose = document.getElementById('op-close');
+    if (opClose) opClose.addEventListener('click', function () { overlay.classList.remove('show'); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') overlay.classList.remove('show'); });
   }
 })();
 </script>
