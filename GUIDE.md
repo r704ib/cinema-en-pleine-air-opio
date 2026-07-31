@@ -38,7 +38,6 @@ Imagine le projet comme un petit commerce — chaque service a un rôle précis 
 | **OVH** | Détient ton nom de domaine `oria-events.fr` et le relie à Firebase. | Le **panneau d'adresse** devant le magasin |
 | **Brevo** | Envoie les emails automatiques (confirmation, notification). | Le **facteur** |
 | **Google Analytics** | Compte le nombre de visiteurs du site. | Le **compteur de passages** à l'entrée |
-| **Netlify** | Ancienne adresse du site (`.netlify.app`), gardée uniquement pour rediriger automatiquement vers la nouvelle adresse. | Le **panneau « a déménagé »** sur l'ancienne vitrine |
 
 **Firebase est en deux parties :**
 
@@ -326,7 +325,6 @@ contrôle** (`controle.html`) qui scanne le QR et affiche en direct :
 | Emails (Brevo) | https://app.brevo.com | `oria.ei@outlook.fr` |
 | Réception des emails du site (redirigés) | — | `oria.ei@outlook.fr` |
 | Nom de domaine (OVH) | https://www.ovh.com/manager/ | `oria.ei@outlook.fr` |
-| Ancien lien (redirige automatiquement) | https://cinema-en-pleine-air-opio.netlify.app | `oria.ei@outlook.fr` |
 | Code du site (GitHub) | https://github.com/r704ib/cinema-en-pleine-air-opio | `r704ib` |
 
 *Notes de version : dossier [`releases/`](releases/).*
