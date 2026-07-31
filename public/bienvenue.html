@@ -57,6 +57,10 @@
     border:1px solid var(--c-gold);color:var(--c-ivory);font-family:var(--font-body);
     font-size:1.9vh;padding:1.2vh 2.2vh;border-radius:999px;cursor:pointer;backdrop-filter:blur(10px);}
   .fsbtn:hover{border-color:var(--c-gold);color:var(--c-gold);}
+  .backbtn{position:fixed;z-index:4;left:2vh;top:2vh;background:rgba(255,255,255,.92);
+    border:1px solid var(--c-gold);color:var(--c-ivory);text-decoration:none;font-family:var(--font-body);
+    font-size:1.8vh;padding:1vh 2vh;border-radius:999px;opacity:0;transition:opacity .25s ease;}
+  .backbtn:hover{opacity:1;}
 
   @media (max-aspect-ratio:1/1){ .next{flex-direction:column;text-align:center;gap:2vh;} }
 </style>
@@ -78,6 +82,7 @@
     <aside class="next" id="next" style="display:none;"></aside>
   </div>
 
+  <a href="index.html" class="backbtn">← Accueil</a>
   <button id="fsbtn" class="fsbtn">⛶ Plein écran</button>
 
 <script type="module">

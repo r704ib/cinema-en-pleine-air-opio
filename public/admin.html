@@ -19,6 +19,8 @@
   .topbar{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
   .topbar .spacer{flex:1;}
   .logout{background:transparent;border:1px solid var(--border);color:var(--ivory);border-radius:8px;padding:8px 14px;cursor:pointer;}
+  .backhome{display:inline-block;color:var(--muted);text-decoration:none;font-size:.9rem;margin-bottom:18px;}
+  .backhome:hover{color:var(--gold);}
   table{width:100%;border-collapse:collapse;font-size:.9rem;}
   th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
   th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;}
@@ -36,6 +38,7 @@
 </style>
 </head>
 <body>
+  <a href="index.html" class="backhome">← Retour à l'accueil</a>
   <div class="login" id="login">
     <h2>Administration — Connexion</h2>
     <div class="err" id="login-err"></div>
