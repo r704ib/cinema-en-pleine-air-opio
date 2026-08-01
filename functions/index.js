@@ -7,7 +7,7 @@ const { defineSecret } = require("firebase-functions/params");
 const logger = require("firebase-functions/logger");
 const admin = require("firebase-admin");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
-const { validateReservationInput, MAX_PLACES } = require("./reservation-logic");
+const { validateReservationInput } = require("./reservation-logic");
 const {
   validateFeedbackInput,
   matchReservationByEmail,
@@ -22,7 +22,6 @@ const {
   buildFeedbackRequestEmail,
   buildFeedbackReminderEmail,
   buildJourJReminderEmail,
-  buildSeanceAnnulationEmail,
 } = require("./email-content");
 
 admin.initializeApp();
@@ -133,30 +132,6 @@ exports.sendJourJReminder = onCall({ secrets: [BREVO_API_KEY] }, async () => {
   }
   logger.info("Rappel jour J terminé", { event: todayEvent.id, sent: sent, skipped: skipped });
   return { sent: sent, skipped: skipped, event: todayEvent.id };
-});
-
-// ⚠️ TEMPORAIRE — annonce l'annulation de la séance du 18/08 aux réservants.
-// Ne change PAS le statut des réservations (elles sont conservées). Idempotent
-// (marque annulation18Sent). Déclenché à la demande, puis à supprimer.
-exports.sendAnnulation18Aout = onCall({ secrets: [BREVO_API_KEY] }, async () => {
-  const apiKey = BREVO_API_KEY.value();
-  const resSnap = await db.collection("reservations").where("eventId", "==", "opio-2026-08-18").get();
-  let sent = 0;
-  let skipped = 0;
-  for (const d of resSnap.docs) {
-    const r = d.data();
-    if (r.status !== "active") continue;
-    if (r.annulation18Sent === true) { skipped++; continue; }
-    try {
-      await sendEmail(apiKey, buildSeanceAnnulationEmail(r, "Mardi 18 août 2026"));
-      await d.ref.set({ annulation18Sent: true, annulation18SentAt: FieldValue.serverTimestamp() }, { merge: true });
-      sent++;
-    } catch (err) {
-      logger.error("Annulation 18/08 échec", { reservationId: d.id, error: String(err) });
-    }
-  }
-  logger.info("Annulation 18/08 terminée", { sent: sent, skipped: skipped });
-  return { sent: sent, skipped: skipped };
 });
 
 exports.createReservation = onCall(async (request) => {
